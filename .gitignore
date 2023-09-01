@@ -1,0 +1,15 @@
+.idea/
+__pycache__/
+
+YGO_2020.toc
+YGO_2020.dat
+YuGi_compress.py
+YuGi_extract.py
+settings.json
+
+/extracted/
+/out/
+/to_compress/
+/custom_decks/*
+/build/
+/dist/
