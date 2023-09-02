@@ -24,5 +24,5 @@ PyInstaller.__main__.run([
     '--add-data', 'data;data',
 ])
 
-with zipfile.ZipFile('dist/CyberEmpire.zip', 'w') as zipf:
+with zipfile.ZipFile('dist/CyberEmpire.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     zipdir('dist/CyberEmpire', zipf)
