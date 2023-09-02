@@ -111,38 +111,31 @@ class CardHelper:
             return cards[0]
         return None
 
-    def get_random_cards(self, random: random.Random, population: list[CardProps] = None, k=1) -> list[CardProps]:
+    def get_random_cards(self, random: random.Random, population: list[CardProps] = None, k=1, limit: int = 3) -> list[
+        CardProps]:
         if population is None:
             population = self.get_included_cards()
-        cards = random.choices([v for v in population], k=k)
+        cards = random.choices(population, k=k)
+        # check for limit
         counter = Counter(cards)
-        while any(v > 3 for key, v in counter.items()):
-            c = 0
+        while any(v > limit for key, v in counter.items()):
+            reroll_count = 0
             for key, v in counter.items():
-                if v <= 3:
+                if v <= limit:
                     continue
-                for c in range(v - 3):
-                    population.remove(key)
-                c += v - 3
-            cards += random.choices(population, k=c)
+                # remove card that is over limit from population
+                population.remove(key)
+                # calc how many over limit
+                over_limit = v - limit
+                # remove over limit cards
+                for _ in range(over_limit):
+                    cards.remove(key)
+                # add over limit count to reroll count
+                reroll_count += over_limit
+            # reroll cards
+            cards += random.choices(population, k=reroll_count)
+            counter = Counter(cards)
+        assert len(cards) == k, f"oops, looks like we fucked up the re-roll for limits: {len(cards)} != {k}"
         return cards
-    def get_normal_and_effect_monsters(self, random: random.Random, k=1, type_: Optional[int] = None) -> list[
-        CardProps]:
-        low_level_count = round(k * .75)
-        high_level_count = k - low_level_count
-        monster_cards = [v for v in self.get_included_cards(type_) if
-                         v.effect in self.get_normal_and_effect_monsters_effects()]
-        low_level_cards = [v for v in monster_cards if v.stars <= 4]
-        high_level_cards = [v for v in monster_cards if v.stars > 4]
-        deck = (self.get_random_cards(random, low_level_cards, low_level_count) +
-                self.get_random_cards(random, high_level_cards, high_level_count))
 
-        return deck
 
-    def get_spell_and_trap_cards(self, random: random.Random, k=1) -> list[CardProps]:
-        spell_count = round(k * .5)
-        trap_count = k - spell_count
-        included_cards = self.get_included_cards()
-        spell_cards = [v for v in included_cards if v.attribute == 8]
-        trap_cards = [v for v in included_cards if v.attribute == 9]
-        return random.choices(spell_cards, k=spell_count) + random.choices(trap_cards, k=trap_count)

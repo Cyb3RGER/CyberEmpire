@@ -32,28 +32,44 @@ class RandomShopPackSettings(IntEnum):
     Randomized = 2
 
 
+class RandomBattlePacksSettings(IntEnum):
+    Off = 0,
+    Shuffled = 1
+    Randomized = 2
+
+
 class RandomizerSettings:
     def __init__(self):
         # deck_data
         self.random_decks: int = RandomDeckSettings.Balanced  # ToDo: Archtype
-        # ToDo: custom balancing options? like monster percentage etc.
         self.exclude_xyz_cards: bool = True
         self.exclude_synchro_cards: bool = True
         self.exclude_pendulum_cards: bool = True
         self.include_custom_decks: bool = True
-        self.only_starter_decks: bool = True
+        self.only_starter_decks: bool = False
+        # ToDo: custom balancing options? like monster percentage etc.
+        # deck balancing
+        self.mon_percent: int = 50
+        self.low_level_percent: int = 75
+        self.high_level_percent: int = 25
+        self.spell_trap_percent: int = 50
+        self.spell_percent: int = 50
+        self.trap_percent: int = 50
         # duelists
         self.random_duelist_portraits: bool = True  # ToDo
+        self.link_duelists_portraits: bool = True  # ToDo
         self.link_duelists_decks: bool = False  # ToDo
         self.random_sig_cards: bool = True
         # shop
-        self.random_shop_packs: int = RandomShopPackSettings.Shuffled
-        self.shuffle_shop_portraits: bool = True
+        self.random_shop_packs: int = RandomShopPackSettings.Randomized
+        self.shuffle_shop_portraits: bool = True # ToDo
         self.random_shop_prices: bool = True
         self.shop_min_price: int = 100  # ToDo: better default values?
         self.shop_max_price: int = 1000  # ToDo: better default values?
         # arenas
         self.shuffle_arenas: bool = True
+
+        self.random_battle_packs: int = RandomBattlePacksSettings.Off  # ToDo
 
     @staticmethod
     def load(path):

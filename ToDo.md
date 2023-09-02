@@ -1,1 +1,1 @@
-- Limit cards to make 3
+- find limit for cards in decks if < 3 and apply when generating decks

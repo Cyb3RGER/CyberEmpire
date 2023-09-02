@@ -5,8 +5,6 @@ import ui
 from randomizer import Randomizer
 from utils import prog_name
 
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog=prog_name,
@@ -14,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument("--game_path", type=str, default=None)
     parser.add_argument('--no_gui', action='store_true')
     parser.add_argument("--settings_path", type=str, default="settings.json")
-    parser.add_argument('-s', '--seed', type=int, default=None,
+    parser.add_argument('-s', '--seed', type=str, default=None,
                         help='seed used to determine randomization. the same seed will always crate the same '
                              'randomization.')
     parser.add_argument('-f', '--force_extract', action='store_true', help='force (re-)extraction of the game files')
