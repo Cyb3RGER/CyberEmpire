@@ -11,5 +11,8 @@ settings.json
 /out/
 /to_compress/
 /custom_decks/*
+!/custom_decks/*.md
 /build/
 /dist/
+
+
