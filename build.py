@@ -13,15 +13,15 @@ def zipdir(path, zipf: zipfile.ZipFile, rel: str = ''):
 subprocess.check_call([f'{os.path.realpath("ui/build_ui.bat")}'], cwd=f'{os.path.realpath("ui")}')
 
 PyInstaller.__main__.run([
-    'main.py',
-    '-n',
-    'CyberEmpire',
-    # '--onefile',
-    '-y',
+    'CyberEmpire.spec',
+    # '-n',
+    # 'CyberEmpire',
+    # '--add-data', 'README.md;.',
+    # '--add-data', 'LICENSE;.',
+    # '--add-data', 'data;data',
+    # '--windowed',
     '--clean',
-    '--windowed',
-    '--add-data', 'README.md;.',
-    '--add-data', 'data;data',
+    '-y',
 ])
 
 with zipfile.ZipFile('dist/CyberEmpire.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:

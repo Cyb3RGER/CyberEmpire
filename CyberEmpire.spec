@@ -8,7 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('README.md', '.'), ('data', 'data')],
+    datas=[('README.md', '.'), ('data', 'data'), ('LICENSE','.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -19,7 +19,18 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+to_dynamic_link = {"PySide6", "shiboken6"}
+to_include = []
+for bundle in a.pure:
+    name, path, _ = bundle
+    if name in to_dynamic_link:
+        py_file = path.split("site-packages")[-1][1:]
+        print("Dynamic linking", name, path, "->", py_file)
+        a.datas.append((py_file, path, "DATA"))
+    else:
+        to_include.append(bundle)
+
+pyz = PYZ(to_include, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
     pyz,
