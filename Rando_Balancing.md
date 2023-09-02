@@ -3,6 +3,8 @@ Even shortened 4 words it seems so very long, also need a proper name for it,
 may be experimenting around with it.
 
 ## Edits
+### v 02.09.2023 5.46pm v
+- added a bit about "Exclusion" (of card types for the randomizer settings) under "Thoughts"
 ### v 31.08.2023 5.27pm v
 - added a section (to be edited) about "Important card Types and Cards".
 - added a small extra about card limitations under "Thoughts".
@@ -159,6 +161,19 @@ There are some cards that are banned, only allowed once/twice, but enemy decks i
 game usually don't care about such rules, however the starter deck may need rules 
 to be able to be used against enemies.
 Every other card in the game has a limit of 3, no exceptions.
+
+### Card exclusions
+For the settings to exclude specific card types, for people who like oldschool yugioh:
+-Union
+-Gemini
+-Tuner(s) (for some reason it once says Tuner and another time it says Tuners)
+-Synchro
+-Xyz
+-Pendulum
+-Spirit
+-Link
+
+And anything that has + that type, like Fusion + Tuner or something, as it still counts as a Tuner that way.
 
 ## Randomizing options?
 
