@@ -88,7 +88,7 @@ Effect monsters are the most common ones, they could have simple effects or very
 ones, it's hard to say how to balance those.
 There are some low level effect monsters that require special means to summon them.
 
-Fusion monsters require some kind of Fusion spell card, there is the very known 
+Fusion monsters require some kind of Fusion spell card, there is the very well-known 
 "Polymerisation" (probably missspellt), but also various others, which I don't know too well.
 Fusions are often made of 2 monsters, but at times can have 3.
 Fusion monsters go in the extra-deck.
@@ -178,36 +178,36 @@ And anything that has + that type, like Fusion + Tuner or something, as it still
 ## Randomizing options?
 
 1. **Full random** 
-- With the usual 20-10-10.
+   - With the usual 20-10-10.
 2. **Type/Attribute decks** 
-- Maybe one that has DARK monsters, one with Fairy, etc.
+   - Maybe one that has DARK monsters, one with Fairy, etc.
 3. **Add Complete preset decks** 
-- Self build or taken from the og game, loaded from a folder.
+   - Self build or taken from the og game, loaded from a folder.
 4. **A way to exclude/include Xyz, Pendulum and Synchro cards.** 
-- To give the oldschool Yugioh feel.
+   - To give the oldschool Yugioh feel.
 5. **Randomize the duel Arenas?** 
-- Also a folder for custom ones, as they are simple pictures.
+   - Also, a folder for custom ones, as they are simple pictures.
 6. **A way to connect/disconnect specific characters being randomized to their own decks.**
-- For example, if a Yugi deck was randomized into a spot, should the Yugi Avatar images be 
-placed onto the character that uses it?
+   - For example, if a Yugi deck was randomized into a spot, should the Yugi Avatar images be 
+   placed onto the character that uses it?
 7. **Randomize the Card Packs in the shop.**
-- Sure, it's about 800 cards per card pack, but they have a general theme with a few randoms 
-thrown into them, for example, without actually proof-checking I can tell you that 
-Joeys pack will probably always have the Red-Eyes Black Dragon in it.
-- The picture on the packs seem to use "Dialog Chars" pictures, **Grandpa Muto Booster Pack** 
-for example uses the *solomonmuto_smile.png*. Maybe there is a pointer that can be changed, 
-to point to a random image.
+   - Sure, it's about 800 cards per card pack, but they have a general theme with a few randoms 
+   thrown into them, for example, without actually proof-checking I can tell you that 
+   Joeys pack will probably always have the Red-Eyes Black Dragon in it.
+   - The picture on the packs seem to use "Dialog Chars" pictures, **Grandpa Muto Booster Pack** 
+   for example uses the *solomonmuto_smile.png*. Maybe there is a pointer that can be changed, 
+   to point to a random image.
 8. **Randomize the Duelist Pictures.** 
-- With option to allow custom ones, while they don't require specific image sizes, 
-it should be mentioned that they should be between specific sizes, to not make it look 
-too weird in game. This option would also further change the Booster Pack images.
+   - With option to allow custom ones, while they don't require specific image sizes, 
+   it should be mentioned that they should be between specific sizes, to not make it look 
+   too weird in game. This option would also further change the Booster Pack images.
 9. **Archetype Deck Randomization** 
-- There are various decks that build around 1 or even 2 archetypes, for example, 
-a 10 card combo that is based on Exodia or Red-Eyes Black Dragon, cards that combo really well 
-off of each other, those could be set to be randomized together at times, could be a neat way 
-to randomize or even increase the difficulty.
+   - There are various decks that build around 1 or even 2 archetypes, for example, 
+   a 10 card combo that is based on Exodia or Red-Eyes Black Dragon, cards that combo really well 
+   off of each other, those could be set to be randomized together at times, could be a neat way 
+   to randomize or even increase the difficulty.
 10. **Price for Card Packs** 
-- So I feel like the 200 per Card Pack is VERY little, so my idea would be to randomize 
-the prices to 1000-2000 or so, as one can get more than 1000 per duel, and being able to build 
-an entire **new** deck after playing *even when losing* **1** Match, just seems very broken. 
-A winning match at the start of the game (don't remember if it changes) can give 1000-1500 points.
+    - So I feel like the 200 per Card Pack is VERY little, so my idea would be to randomize 
+    the prices to 1000-2000 or so, as one can get more than 1000 per duel, and being able to build 
+    an entire **new** deck after playing *even when losing* **1** Match, just seems very broken. 
+    A winning match at the start of the game (don't remember if it changes) can give 1000-1500 points.

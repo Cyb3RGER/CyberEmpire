@@ -11,7 +11,7 @@ temp = []
 for name in names:
     temp += name.split(' ')
 
-words = set([x.capitalize() for x in temp if x.isascii() and x.isalpha() and len(x) > 5 and len(x) < 10])
+words = set([x.capitalize() for x in temp if x.isascii() and x.isalpha() and 5 < len(x) < 10])
 with open('seed_word_tbl.py', 'w') as f:
     f.write(f'word_tbl = {list(words)}')
 

@@ -6,6 +6,7 @@ from statistics import mean
 from typing import Optional
 
 from cards import CardHelper
+from custom_decks import CustomDeckParser, ParseException, CustomDeck
 from dfymoo import Dfymoo
 from compress import compress
 from decks import Deck, DeckData
@@ -14,7 +15,8 @@ from gen_card_props import CardProps
 from mappers import *
 from packs import PackDefData, Pack
 from seed_word_tbl import word_tbl
-from settings import RandomizerSettings, RandomDeckSettings, RandomShopPackSettings, RandomBattlePacksSettings
+from settings import RandomizerSettings, RandomDeckSettings, RandomShopPackSettings, RandomBattlePacksSettings, \
+    RandomDuelistPortraitSettings
 from utils import prog_name, delete_folder
 
 seed_digits = 20
@@ -43,13 +45,14 @@ class Randomizer:
         self.deck_data: DeckData | None = None
         self.card_helper: CardHelper | None = None
         self.card_props: list[CardProps] = []
-        self.random_decks: dict[str, Deck] = {}
+        self.decks: dict[str, Deck] = {}
         self.random_shop_packs: dict[str, Pack] = {}
 
         self.randomized_sig_cards: list[(str, str, str)] = []
         self.shuffled_arena_files: dict[str, str] = {}
         self.shuffled_deck_files: dict[str, str] = {}
-        self.custom_decks: list[str] = []
+        self.custom_decks: list[CustomDeck] = []
+        self.broken_custom_decks: list[str] = []
         self.shuffled_shop_portraits: dict[str, str] = {}
         self.shuffled_pack_reward_images: dict[str, str] = {}
         self.shuffled_shop_packs: dict[str, str] = {}
@@ -87,30 +90,34 @@ class Randomizer:
         step = 0
         max_step = 3
         try:
-            yield ++step, "setting up randomizer...", max_step
+            yield step, "setting up randomizer...", max_step
+            step += 1
             self.card_helper = CardHelper(self.settings)
             self.setup_seed()
             print(self.seed, self.settings)
             self.setup_game_files()
-            self.get_custom_decks_file_list()
+            self.get_custom_decks()
             # ToDo: self.write_default_placement_files()
             if self.placement_folder:
-                yield ++step, "applying placement file(s)...", max_step
+                yield step, "applying placement file(s)...", max_step
+                step += 1
                 # ToDo
                 self.apply_placement()
             else:
-                yield ++step, "randomizing...", 3
+                yield step, "randomizing...", 3
+                step += 1
                 gen = self.randomize()
                 for i in gen:
                     if i[0] == -1:
                         yield i
                     else:
                         yield 1, "randomizing...", max_step, *i
-            yield ++step, "writing output...", max_step
+            yield step, "writing output...", max_step
+            step += 1
             self.output_result()
             # ToDo? self.copy_to_game_path()
             self.cleanup()
-            yield ++step, "done...", max_step
+            yield step, "done...", max_step
         except Exception as e:
             yield -1, e, traceback.format_exc()
 
@@ -152,7 +159,8 @@ class Randomizer:
         step = 0
         max_step = 7
         try:
-            yield ++step, "randomizing decks...", max_step
+            yield step, "randomizing decks...", max_step
+            step += 1
             if self.settings.random_decks == RandomDeckSettings.Off:
                 pass
             elif self.settings.random_decks in [RandomDeckSettings.Balanced, RandomDeckSettings.Full_Random,
@@ -160,13 +168,15 @@ class Randomizer:
                 self.randomize_decks()
             elif self.settings.random_decks == RandomDeckSettings.Shuffled:
                 self.shuffle_decks()
-            elif self.settings.random_decks == RandomDeckSettings.Archtype:
+            elif self.settings.random_decks == RandomDeckSettings.Archetype:
                 # ToDo
                 pass
-            yield ++step, "randomizing arenas...", max_step
+            yield step, "randomizing arenas...", max_step
+            step += 1
             if self.settings.shuffle_arenas:
                 self.shuffle_arenas()
-            yield ++step, "randomizing shop packs...", max_step
+            yield step, "randomizing shop packs...", max_step
+            step += 1
             if self.settings.random_shop_packs == RandomShopPackSettings.Off and self.settings.random_battle_packs != RandomBattlePacksSettings.Off:
                 # we need to make sure shop packs are also in the compress folder, if they are not random,
                 # when we change packs.zib content, otherwise the compress script will not repack them
@@ -175,19 +185,24 @@ class Randomizer:
                 self.shuffle_shop_packs()
             elif self.settings.random_shop_packs == RandomShopPackSettings.Randomized:
                 self.randomize_shop_packs()
-            yield ++step, "randomizing shop portraits...", max_step
+            yield step, "randomizing shop portraits...", max_step
+            step += 1
             if self.settings.shuffle_shop_portraits:
                 self.shuffle_shop_portraits()
-            yield ++step, "randomizing shop prices...", max_step
+            yield step, "randomizing shop prices...", max_step
+            step += 1
             if self.settings.random_shop_prices:
                 self.randomize_shop_prices()
-            yield ++step, "randomizing signature cards...", max_step
+            yield step, "randomizing signature cards...", max_step
+            step += 1
             if self.settings.random_sig_cards:
                 self.randomize_sig_cards()
-            yield ++step, "randomizing portraits...", max_step
-            if self.settings.random_duelist_portraits:
+            yield step, "randomizing portraits...", max_step
+            step += 1
+            if self.settings.random_duelist_portraits != RandomDuelistPortraitSettings.Off:
                 self.shuffle_duelists_portraits()
-            yield ++step, "randomizing battle packs...", max_step
+            yield step, "randomizing battle packs...", max_step
+            step += 1
             if self.settings.random_battle_packs == RandomBattlePacksSettings.Off and self.settings.random_shop_packs != RandomShopPackSettings.Off:
                 # we need to make sure battle packs are also in the compress folder, if they are not random,
                 # when we change packs.zib content, otherwise the compress script will not repack them
@@ -197,7 +212,15 @@ class Randomizer:
 
     def shuffle_decks(self):
         deck_files = self.get_deck_file_list(self.settings.only_starter_decks)
-        self.shuffled_deck_files = self.shuffle_list(deck_files, self.custom_decks)
+        custom_deck_list: list[CustomDeck] = self.custom_decks.copy()
+        if self.settings.random_custom_decks:
+            custom_deck_list = random.sample(self.custom_decks,
+                                             k=self.random.randint(0, min(len(self.custom_decks), len(deck_files))))
+        for v in custom_deck_list:
+            deck = self.card_helper.get_deck_from_custom_deck(v, self.random)
+            self.decks[deck.name] = deck
+        self.shuffled_deck_files = self.shuffle_list(deck_files, [f'custom_{v.name}' for v in custom_deck_list],
+                                                     not self.settings.random_custom_decks)
         if self.settings.only_starter_decks:
             temp = set(deck_files)
             deck_files = self.get_deck_file_list(False)
@@ -209,38 +232,43 @@ class Randomizer:
         arena_files = self.get_arena_file_list()
         self.shuffled_arena_files = self.shuffle_list(arena_files)
 
-    def shuffle_list(self, list_: list[str], include_extra: list[str] = None) -> dict[str, str]:
+    def shuffle_list(self, list_: list[str], include_extra: list[str] = None, extra_first: bool = True) -> dict[
+        str, str]:
         shuffled_list = list_.copy()
         if include_extra is not None:
-            shuffled_list += include_extra
+            if extra_first:
+                k = max(0, len(list_) - len(include_extra))
+                shuffled_list = self.random.sample(list_, k=k)
+                shuffled_list += include_extra
+            else:
+                shuffled_list += include_extra
         self.random.shuffle(shuffled_list)
         return {x: shuffled_list[i] for i, x in enumerate(list_)}
 
-    def apply_random_deck_files(self, files):
+    def apply_deck_files(self, files: dict[str, str]):
         src_folder = f'{extract_path}/decks.zib'
         dst_folder = f'{compress_path}/decks.zib'
         if not os.path.exists(dst_folder):
             os.mkdir(dst_folder)
         for k, v in files.items():
             dst = f'{dst_folder}/{k}'
-            if v not in self.random_decks:
+            if v not in self.decks:
                 src = f'{src_folder}/{v}'
                 print(f'{src} -> {dst}')
                 shutil.copyfile(src, dst)
             else:
-                deck = self.random_decks[v]
+                deck = self.decks[v]
                 print(f'writing {dst}')
                 deck.write(dst)
 
-    def apply_shuffled_files(self, subdir, shuffled_files):
+    def apply_shuffled_files(self, subdir, shuffled_files: dict[str, str]):
         src_folder = f'{extract_path}/{subdir}'
-        src_folder_custom = f'{custom_decks_path}'
         dst_folder = f'{compress_path}/{subdir}'
         if not os.path.exists(dst_folder):
             os.makedirs(dst_folder, exist_ok=True)
         for k, v in shuffled_files.items():
-            src = f'{src_folder_custom if self.is_custom_deck(v) else src_folder}/{v}'
             dst = f'{dst_folder}/{k}'
+            src = f'{src_folder}/{v}'
             print(f'{src} -> {dst}')
             shutil.copyfile(src, dst)
 
@@ -258,11 +286,11 @@ class Randomizer:
             if self.settings.random_decks == RandomDeckSettings.Off:
                 pass
             elif self.settings.random_decks == RandomDeckSettings.Shuffled:
-                self.apply_shuffled_files('deck_data.zib', self.shuffled_deck_files)
+                self.apply_deck_files(self.shuffled_deck_files)
             elif self.settings.random_decks in [RandomDeckSettings.Balanced, RandomDeckSettings.Full_Random,
                                                 RandomDeckSettings.By_Type]:
-                self.apply_random_deck_files(self.shuffled_deck_files)
-            elif self.settings.random_decks == RandomDeckSettings.Archtype:
+                self.apply_deck_files(self.shuffled_deck_files)
+            elif self.settings.random_decks == RandomDeckSettings.Archetype:
                 # ToDo
                 pass
             # arenas
@@ -277,13 +305,13 @@ class Randomizer:
                 self.apply_random_shop_pack_files(self.shuffled_shop_packs)
             if self.settings.shuffle_shop_portraits:
                 self.pack_wrappers_dfymoo.write(f'{compress_path}/pdui/PackWrappers.dfymoo')
-                self.apply_shuffled_files('packs',self.shuffled_pack_reward_images)
+                self.apply_shuffled_files('packs', self.shuffled_pack_reward_images)
             if self.settings.random_shop_prices:
                 self.pack_data.write(f'{compress_path}')
             # duelists
             if self.settings.random_sig_cards:
                 self.deck_data.write(f'{compress_path}')
-            if self.settings.random_duelist_portraits:
+            if self.settings.random_duelist_portraits != RandomDuelistPortraitSettings.Off:
                 self.apply_shuffled_files('busts.zib', self.shuffled_bust_files)
                 self.apply_shuffled_files('pdui/dialog_chars', self.shuffled_dialog_files)
                 self.char_dfymoo.write(f'{compress_path}/pdui/chars.dfymoo')
@@ -356,7 +384,7 @@ class Randomizer:
             spell_trap_count = deck.main_count - mon_count
             type_ = None
             if self.settings.random_decks == RandomDeckSettings.By_Type:
-                type_ = self.random.randint(0, 24)
+                type_ = self.random.randint(1, 23)
             normal_mons = self.get_normal_and_effect_monsters(self.random, mon_count, type_)
             spell_traps = self.get_spell_and_trap_cards(self.random, spell_trap_count)
             deck.main_ids = [v.id_ for v in normal_mons] + [v.id_ for v in spell_traps]
@@ -370,10 +398,12 @@ class Randomizer:
                          v.effect in self.card_helper.get_normal_and_effect_monsters_effects()]
         low_level_cards = [v for v in monster_cards if v.stars <= 4]
         high_level_cards = [v for v in monster_cards if v.stars > 4]
-        deck = (self.card_helper.get_random_cards(random, low_level_cards, k=low_level_count) +
-                self.card_helper.get_random_cards(random, high_level_cards, k=high_level_count))
-
-        return deck
+        assert len(monster_cards) > 0, f"not enough mon cards for {type_}"
+        assert len(low_level_cards) > 0, f"not enough low mon cards for {type_}"
+        assert len(high_level_cards) > 0, f"not enough high mon cards for {type_}"
+        cards = (self.card_helper.get_random_cards(random, low_level_cards, k=low_level_count) +
+                 self.card_helper.get_random_cards(random, high_level_cards, k=high_level_count))
+        return cards
 
     def get_spell_and_trap_cards(self, random: random.Random, k=1) -> list[CardProps]:
         spell_count = round(k * self.settings.spell_percent / 100)
@@ -383,17 +413,24 @@ class Randomizer:
         trap_cards = [v for v in included_cards if v.attribute == 9]
         return random.choices(spell_cards, k=spell_count) + random.choices(trap_cards, k=trap_count)
 
-    def get_custom_decks_file_list(self):
+    def get_custom_decks(self):
+        parser = CustomDeckParser()
         self.custom_decks = []
+        self.broken_custom_decks = []
         if not os.path.exists(custom_decks_path):
             os.mkdir(custom_decks_path)
             return
         for entry in os.scandir(custom_decks_path):
-            if entry.is_file() and entry.name.endswith('.ydc'):
-                self.custom_decks.append(entry.name)
+            if entry.is_file() and entry.name.endswith('.txt'):
+                try:
+                    deck = parser.load(entry)
+                except ParseException:
+                    self.broken_custom_decks.append(entry)
+                    continue
+                self.custom_decks.append(deck)
 
-    def is_custom_deck(self, name):
-        return name in self.custom_decks
+    def is_custom_deck(self, v):
+        return isinstance(v, Deck)
 
     def randomize_sig_cards(self):
         self.deck_data = DeckData(f'{extract_path}')
@@ -415,11 +452,23 @@ class Randomizer:
         return result
 
     def randomize_decks(self):
+        custom_deck_list: list[CustomDeck] = self.custom_decks.copy()
         deck_files = self.get_deck_file_list(self.settings.only_starter_decks)
+        if self.settings.random_custom_decks:
+            custom_deck_list = random.sample(self.custom_decks,
+                                             k=self.random.randint(0, min(len(self.custom_decks), len(deck_files))))
+        custom_deck_placements = enumerate(
+            self.random.sample(deck_files, k=min(len(deck_files), len(custom_deck_list))))
+        custom_deck_placements = {k: custom_deck_list[i] for i, k in custom_deck_placements}
         for i, v in enumerate(deck_files):
-            deck = self.create_random_deck(i)
-            self.random_decks[deck.name] = deck
-            self.shuffled_deck_files[v] = deck.name
+            if v in custom_deck_placements:
+                deck = self.card_helper.get_deck_from_custom_deck(custom_deck_placements[v], self.random)
+                self.decks[deck.name] = deck
+                self.shuffled_deck_files[v] = deck.name
+            else:
+                deck = self.create_random_deck(i)
+                self.decks[deck.name] = deck
+                self.shuffled_deck_files[v] = deck.name
         if self.settings.only_starter_decks:
             temp = set(deck_files)
             deck_files = self.get_deck_file_list(False)
@@ -462,7 +511,8 @@ class Randomizer:
     def shuffle_shop_portraits(self):
         self.pack_wrappers_dfymoo = Dfymoo()
         self.pack_wrappers_dfymoo.load(f'{extract_path}/pdui/PackWrappers.dfymoo')
-        shop_portraits = [v for v in self.pack_wrappers_dfymoo.get_names() if 'battlepack' not in v and v != 'wrap_locked']
+        shop_portraits = [v for v in self.pack_wrappers_dfymoo.get_names() if
+                          'battlepack' not in v and v != 'wrap_locked']
         self.shuffled_shop_portraits = self.shuffle_list(shop_portraits)
         for v in self.pack_wrappers_dfymoo.vals:
             image_name_og = self.convert_wrapper_name_to_reward_image(v.n)
@@ -540,7 +590,7 @@ class Randomizer:
         bust_files = self.get_bust_file_list()
         self.shuffled_bust_files = self.shuffle_list(bust_files)
         dialog_files = self.get_dialog_file_list()
-        if self.settings.link_duelists_portraits:
+        if self.settings.random_duelist_portraits == RandomDuelistPortraitSettings.Coherent:
             mapping: dict[str, str] = {}
             for k, v in self.shuffled_bust_files.items():
                 mapping[self.get_char_name_for_bust_file(k)] = self.get_char_name_for_bust_file(v)
@@ -562,7 +612,7 @@ class Randomizer:
         self.char_dfymoo.load(f"{extract_path}/pdui/chars.dfymoo")
         combat_portrait_names = self.char_dfymoo.get_names()
         combat_portrait_names.remove('icon_char_locked')
-        if self.settings.link_duelists_portraits:
+        if self.settings.random_duelist_portraits == RandomDuelistPortraitSettings.Coherent:
             temp = []
             for k, v in self.shuffled_bust_files.items():
                 k_removed_png = k[:-len('.png')]

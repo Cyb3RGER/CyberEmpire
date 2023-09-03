@@ -4,6 +4,8 @@ import random
 from collections import Counter
 from typing import Literal, Optional
 
+from custom_decks import CustomDeck
+from decks import Deck
 # from gen_card_props import main
 from mappers import effect_name_mapper, attribute_name_mapper, spell_type_name_mapper, type_name_mapper, \
     monster_name_mapper
@@ -68,6 +70,11 @@ class CardHelper:
         self.exclude_xyz_cards: bool = settings.exclude_xyz_cards
         self.exclude_pendulum_cards: bool = settings.exclude_pendulum_cards
         self.exclude_synchro_cards: bool = settings.exclude_synchro_cards
+        self.exclude_link_cards: bool = settings.exclude_link_cards
+        self.exclude_union_cards: bool = settings.exclude_union_cards
+        self.exclude_gemini_cards: bool = settings.exclude_gemini_cards
+        self.exclude_tuner_cards: bool = settings.exclude_tuner_cards
+        self.exclude_spirit_cards: bool = settings.exclude_spirit_cards
         self.load_card_props()
 
     def load_card_props(self):
@@ -88,18 +95,35 @@ class CardHelper:
     def get_synchro_effects(self) -> list[int]:
         return [17, 18, 19, 36]
 
+    def get_link_effects(self) -> list[int]:
+        return [42, 43]
+
+    def get_union_effects(self) -> list[int]:
+        return [8, 37]
+
+    def get_gemini_effects(self) -> list[int]:
+        return [9]
+
+    def get_tuner_effects(self) -> list[int]:
+        return [15, 16, 19, 32, 33, 37, 39, 44]
+
+    def get_spirit_effects(self) -> list[int]:
+        return [7, 29, 38, 45]
+
     def get_normal_and_effect_monsters_effects(self) -> list[int]:
         return [0, 1, 24]
 
     def get_included_cards(self, type_: Optional[int] = None) -> list[CardProps]:
         def filter_func(x: CardProps) -> bool:
-            if self.exclude_xyz_cards and x.monster == 2:
-                return False
-            if self.exclude_synchro_cards and x.effect in self.get_synchro_effects():
-                return False
-            if self.exclude_pendulum_cards and x.pendulum != 0:
-                return False
-            if type_ is not None and x.type_ != type_:
+            if (self.exclude_xyz_cards and x.monster == 2
+                    or self.exclude_synchro_cards and x.effect in self.get_synchro_effects()
+                    or self.exclude_pendulum_cards and (x.pendulum != 0 or x.effect in self.get_pendulum_effects())
+                    or self.exclude_link_cards and (x.monster == 3 or x.effect in self.get_link_effects())
+                    or self.exclude_union_cards and x.effect in self.get_union_effects()
+                    or self.exclude_gemini_cards and x.effect in self.get_gemini_effects()
+                    or self.exclude_tuner_cards and x.effect in self.get_tuner_effects()
+                    or self.exclude_spirit_cards and x.effect in self.get_spirit_effects()
+                    or type_ is not None and x.type_ != type_):
                 return False
             return True
 
@@ -115,6 +139,7 @@ class CardHelper:
         CardProps]:
         if population is None:
             population = self.get_included_cards()
+        assert len(population) > 0, f'how? {population}, {k}'
         cards = random.choices(population, k=k)
         # check for limit
         counter = Counter(cards)
@@ -138,4 +163,26 @@ class CardHelper:
         assert len(cards) == k, f"oops, looks like we fucked up the re-roll for limits: {len(cards)} != {k}"
         return cards
 
+    def get_deck_from_custom_deck(self, custom_deck: CustomDeck, random: random.Random) -> Deck:
+        deck = Deck(f'custom_{custom_deck.name}')
+        deck.main_count = custom_deck.main_count
+        deck.main_ids = self._get_id_list(random, custom_deck.main_ids, custom_deck.main_count, custom_deck.filler_ids)
+        deck.extra_count = custom_deck.extra_count
+        deck.extra_ids = self._get_id_list(random, custom_deck.extra_ids, custom_deck.extra_count,
+                                           custom_deck.filler_ids)
+        deck.side_count = custom_deck.side_count
+        deck.side_ids = self._get_id_list(random, custom_deck.side_ids, custom_deck.side_count, custom_deck.filler_ids)
+        return deck
 
+    def _get_id_list(self, random: random.Random, id_list: list[int], count: int, filler: list[int]) -> list[int]:
+        result: list[int]
+        if len(id_list) > count:
+            result = random.choices(id_list, k=count)
+        else:
+            result = id_list.copy()
+        if len(result) < count:
+            if len(filler) > 0:
+                result += random.choices(filler, k=count - len(result))
+            else:
+                raise 'not enough cards to fill deck'
+        return result

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>600</height>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,35 +22,8 @@
    </property>
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="2" column="0">
-     <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,1,1,1" columnstretch="1,1">
+     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,1,1,1,0" columnstretch="1,1">
       <item row="2" column="1">
-       <widget class="QGroupBox" name="grp_opt_arenas">
-        <property name="title">
-         <string>Arenas</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_8">
-         <item row="0" column="0">
-          <layout class="QFormLayout" name="formLayout_3">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>Shuffle Arenas:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="chb_shuffle_arenas">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="1">
        <widget class="QGroupBox" name="grp_opt_duelists">
         <property name="title">
          <string>Duelists</string>
@@ -59,21 +32,14 @@
          <item row="0" column="0">
           <layout class="QFormLayout" name="formLayout_6">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_11">
+            <widget class="QLabel" name="lbl_random_duelist_portraits">
              <property name="text">
               <string>Randomize Duelist Portraits</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="chb_duelist_portrais">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_3">
+            <widget class="QLabel" name="lbl_link_duelists_decks">
              <property name="text">
               <string>Randomize Portraits with Decks</string>
              </property>
@@ -87,7 +53,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="lbl_random_sig_cards">
              <property name="text">
               <string>Randomize Signature Cards</string>
              </property>
@@ -100,12 +66,15 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmb_random_duelist_portraits"/>
+           </item>
           </layout>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="1" column="0" rowspan="3">
+      <item row="2" column="0" rowspan="3">
        <widget class="QGroupBox" name="grp_opt_decks">
         <property name="title">
          <string>Decks</string>
@@ -114,7 +83,7 @@
          <item row="0" column="0">
           <layout class="QFormLayout" name="formLayout">
            <item row="0" column="0">
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="lbl_decks">
              <property name="text">
               <string>Randomize Decks</string>
              </property>
@@ -123,50 +92,147 @@
            <item row="0" column="1">
             <widget class="QComboBox" name="cmb_decks"/>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Exclude XYZ Cards</string>
+           <item row="1" column="0" colspan="2">
+            <widget class="QGroupBox" name="grp_opt_no">
+             <property name="title">
+              <string>Exclude </string>
              </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="chb_no_xyz">
-             <property name="text">
-              <string/>
-             </property>
+             <layout class="QGridLayout" name="gridLayout_9">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="gridLayout_7">
+                <item row="3" column="0">
+                 <widget class="QLabel" name="lbl_no_link">
+                  <property name="text">
+                   <string>Link Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="QCheckBox" name="chb_no_gemini">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Gemini Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Tuner Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="lbl_no_xyz">
+                  <property name="text">
+                   <string>XYZ Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QCheckBox" name="chb_no_pendulum">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Union Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="2">
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>Spirit Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QCheckBox" name="chb_no_xyz">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="lbl_no_pendulum">
+                  <property name="text">
+                   <string>Pendulum Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QCheckBox" name="chb_no_tuner">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="chb_no_link">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3">
+                 <widget class="QCheckBox" name="chb_no_spirit">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="lbl_no_synchro">
+                  <property name="text">
+                   <string>Synchro Cards</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="chb_no_synchro">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QCheckBox" name="chb_no_union">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="lbl_only_starter_decks">
              <property name="text">
-              <string>Exclude Pendulum Cards</string>
+              <string>Only Starter Decks</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QCheckBox" name="chb_no_pendulum">
+            <widget class="QCheckBox" name="chb_only_starter_decks">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Exclude Synchro Cards</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QCheckBox" name="chb_no_synchro">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_16">
+            <widget class="QLabel" name="lbl_include_custom">
              <property name="toolTip">
               <string>Load Custom decks from the 'custom_decks' folder. Decks have to be in the .ydc format.</string>
              </property>
@@ -175,28 +241,39 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="3" column="1">
             <widget class="QCheckBox" name="chb_include_custom">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QCheckBox" name="chb_only_starter_decks">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_26">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_13">
-             <property name="text">
-              <string>Only randomize Starter Decks</string>
-             </property>
-            </widget>
+           <item row="4" column="1">
+            <layout class="QFormLayout" name="formLayout_11">
+             <item row="0" column="0">
+              <widget class="QLabel" name="lbl_custom_random">
+               <property name="text">
+                <string>Use random amount</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QCheckBox" name="chb_custom_random">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
-           <item row="6" column="0" colspan="2">
+           <item row="5" column="0" colspan="2">
             <widget class="QGroupBox" name="grp_balance_opts">
              <property name="title">
               <string>Balancing</string>
@@ -205,7 +282,7 @@
               <item row="0" column="1">
                <layout class="QFormLayout" name="formLayout_7">
                 <item row="0" column="0">
-                 <widget class="QLabel" name="label_17">
+                 <widget class="QLabel" name="lbl_mon_percent">
                   <property name="text">
                    <string>Monster Precent</string>
                   </property>
@@ -236,14 +313,14 @@
                 <item row="1" column="1">
                  <layout class="QFormLayout" name="formLayout_8">
                   <item row="0" column="0">
-                   <widget class="QLabel" name="label_18">
+                   <widget class="QLabel" name="lbl_low_level_percent">
                     <property name="text">
                      <string>1-4 stars</string>
                     </property>
                    </widget>
                   </item>
                   <item row="1" column="0">
-                   <widget class="QLabel" name="label_19">
+                   <widget class="QLabel" name="lbl_high_level_percent">
                     <property name="text">
                      <string>5+ stars</string>
                     </property>
@@ -281,7 +358,7 @@
                  </layout>
                 </item>
                 <item row="2" column="0">
-                 <widget class="QLabel" name="label_20">
+                 <widget class="QLabel" name="lbl_spell_trap_percent">
                   <property name="text">
                    <string>Spell/Trap Percent</string>
                   </property>
@@ -314,14 +391,14 @@
                 <item row="3" column="1">
                  <layout class="QFormLayout" name="formLayout_9">
                   <item row="0" column="0">
-                   <widget class="QLabel" name="label_23">
+                   <widget class="QLabel" name="lbl_spell_percent">
                     <property name="text">
                      <string>Spell Percent</string>
                     </property>
                    </widget>
                   </item>
                   <item row="1" column="0">
-                   <widget class="QLabel" name="label_24">
+                   <widget class="QLabel" name="lbl_trap_percent">
                     <property name="text">
                      <string>Trap Percent</string>
                     </property>
@@ -374,14 +451,14 @@
          <item row="0" column="0">
           <layout class="QFormLayout" name="formLayout_4">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_12">
+            <widget class="QLabel" name="lbl_shop_packs">
              <property name="text">
               <string>Randomize Shop Packs</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_15">
+            <widget class="QLabel" name="lbl_shop_portraits">
              <property name="text">
               <string>Shuffle Shop Portraits</string>
              </property>
@@ -395,7 +472,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_8">
+            <widget class="QLabel" name="lbl_shop_prices">
              <property name="text">
               <string>Randomize Shop Prices</string>
              </property>
@@ -411,7 +488,7 @@
            <item row="3" column="1">
             <layout class="QFormLayout" name="formLayout_5">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_9">
+              <widget class="QLabel" name="lbl_min_price">
                <property name="text">
                 <string>Minimum Price</string>
                </property>
@@ -434,7 +511,7 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_10">
+              <widget class="QLabel" name="lbl_max_price">
                <property name="text">
                 <string>Maximum Price</string>
                </property>
@@ -470,7 +547,49 @@
         </layout>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2">
+      <item row="1" column="0" colspan="2">
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <layout class="QFormLayout" name="formLayout_10">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lbl_seed">
+             <property name="text">
+              <string>Seed</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="txt_seed">
+             <property name="toolTip">
+              <string/>
+             </property>
+             <property name="whatsThis">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>Leave blank for random seed</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>Hover over an option for more info</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
        <widget class="QPushButton" name="btn_run">
         <property name="text">
          <string>Randomize</string>
@@ -483,24 +602,37 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QWidget" name="widget" native="true">
-        <layout class="QGridLayout" name="gridLayout_4">
+      <item row="4" column="1">
+       <widget class="QGroupBox" name="grp_opt_arenas">
+        <property name="title">
+         <string>Other</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_8">
          <item row="0" column="0">
-          <layout class="QFormLayout" name="formLayout_10">
+          <layout class="QFormLayout" name="formLayout_3">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_14">
+            <widget class="QLabel" name="lbl_shuffle_arenas">
              <property name="text">
-              <string>Seed</string>
+              <string>Shuffle Arenas</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="txt_seed">
-             <property name="placeholderText">
-              <string>Leave blank for random seed</string>
+            <widget class="QCheckBox" name="chb_shuffle_arenas">
+             <property name="text">
+              <string/>
              </property>
             </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lbl_random_battle_packs">
+             <property name="text">
+              <string>Randomize Battle Packs</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="cmb_random_battle_packs"/>
            </item>
           </layout>
          </item>

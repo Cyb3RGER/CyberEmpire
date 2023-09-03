@@ -43,6 +43,8 @@ class CardNameMapper(NameMapper):
             return -1
         return self.name_to_id[name]
 
+    def is_valid_id(self, card_id: int) -> bool:
+        return card_id in self.id_to_name
 
 class CharNameMapper(NameMapper):
     def __init__(self):

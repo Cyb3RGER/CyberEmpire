@@ -19,17 +19,23 @@ def decode_randomizer_settings(dict):
 
 class RandomDeckSettings(IntEnum):
     Off = 0,
-    Balanced = 1,
-    Full_Random = 2,
-    By_Type = 3,
-    Shuffled = 4,
-    Archtype = 5,
+    Shuffled = 1,
+    Balanced = 2,
+    Full_Random = 3,
+    By_Type = 4,
+    Archetype = 5,
 
 
 class RandomShopPackSettings(IntEnum):
     Off = 0,
     Shuffled = 1
     Randomized = 2
+
+
+class RandomDuelistPortraitSettings(IntEnum):
+    Off = 0,
+    Coherent = 1,
+    Chaos = 2
 
 
 class RandomBattlePacksSettings(IntEnum):
@@ -41,11 +47,17 @@ class RandomBattlePacksSettings(IntEnum):
 class RandomizerSettings:
     def __init__(self):
         # deck_data
-        self.random_decks: int = RandomDeckSettings.Balanced  # ToDo: Archtype
+        self.random_decks: int = RandomDeckSettings.Balanced  # ToDo: Archetype
         self.exclude_xyz_cards: bool = True
         self.exclude_synchro_cards: bool = True
         self.exclude_pendulum_cards: bool = True
+        self.exclude_link_cards: bool = True
+        self.exclude_union_cards: bool = True
+        self.exclude_gemini_cards: bool = True
+        self.exclude_tuner_cards: bool = True
+        self.exclude_spirit_cards: bool = True
         self.include_custom_decks: bool = True
+        self.random_custom_decks: bool = True
         self.only_starter_decks: bool = False
         # ToDo: custom balancing options? like monster percentage etc.
         # deck balancing
@@ -56,19 +68,17 @@ class RandomizerSettings:
         self.spell_percent: int = 50
         self.trap_percent: int = 50
         # duelists
-        self.random_duelist_portraits: bool = True  # ToDo
-        self.link_duelists_portraits: bool = True  # ToDo
+        self.random_duelist_portraits: int = RandomDuelistPortraitSettings.Coherent  # ToDo
         self.link_duelists_decks: bool = False  # ToDo
         self.random_sig_cards: bool = True
         # shop
         self.random_shop_packs: int = RandomShopPackSettings.Randomized
-        self.shuffle_shop_portraits: bool = True # ToDo
+        self.shuffle_shop_portraits: bool = True
         self.random_shop_prices: bool = True
         self.shop_min_price: int = 100  # ToDo: better default values?
         self.shop_max_price: int = 1000  # ToDo: better default values?
-        # arenas
+        # others
         self.shuffle_arenas: bool = True
-
         self.random_battle_packs: int = RandomBattlePacksSettings.Off  # ToDo
 
     @staticmethod

@@ -1,4 +1,4 @@
-# New format for custom decks
+# Format for custom decks
 
 ``<name of deck> = <amount of cards>`` followed by a list of card ids.
 

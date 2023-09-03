@@ -1,11 +1,10 @@
-import asyncio
-import os
-
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QProgressDialog, QMessageBox
 
 from randomizer import Randomizer
-from settings import RandomDeckSettings, RandomShopPackSettings
+from settings import RandomDeckSettings, RandomShopPackSettings, RandomBattlePacksSettings, \
+    RandomDuelistPortraitSettings
+from ui.mainwindow_tooltips import tooltips
 from ui.ui_mainwindow import Ui_MainWindow
 from utils import prog_name
 
@@ -22,8 +21,13 @@ class MainWindow(QMainWindow):
         # setup widgets
         for v in RandomDeckSettings:
             self.ui.cmb_decks.addItem(v.name.replace('_', ' '))
+        for v in RandomDuelistPortraitSettings:
+            self.ui.cmb_random_duelist_portraits.addItem(v.name.replace('_', ' '))
         for v in RandomShopPackSettings:
             self.ui.cmb_shop_packs.addItem(v.name.replace('_', ' '))
+        for v in RandomBattlePacksSettings:
+            self.ui.cmb_random_battle_packs.addItem(v.name.replace('_', ' '))
+        self.set_tooltips()
 
         self.apply_settings()
 
@@ -31,11 +35,17 @@ class MainWindow(QMainWindow):
         self.ui.action_copy_game_files.triggered.connect(self.game_path_browse)
         self.ui.txt_seed.textChanged.connect(self.update_seed)
         self.ui.cmb_decks.currentIndexChanged.connect(self.update_setting)
-        self.ui.cmb_decks.currentIndexChanged.connect(self.enable_balancing_options)
+        self.ui.cmb_decks.currentIndexChanged.connect(self.enable_deck_option_groups)
         self.ui.chb_no_xyz.stateChanged.connect(self.update_setting)
         self.ui.chb_no_pendulum.stateChanged.connect(self.update_setting)
         self.ui.chb_no_synchro.stateChanged.connect(self.update_setting)
+        self.ui.chb_no_link.stateChanged.connect(self.update_setting)
+        self.ui.chb_no_union.stateChanged.connect(self.update_setting)
+        self.ui.chb_no_gemini.stateChanged.connect(self.update_setting)
+        self.ui.chb_no_tuner.stateChanged.connect(self.update_setting)
+        self.ui.chb_no_spirit.stateChanged.connect(self.update_setting)
         self.ui.chb_include_custom.stateChanged.connect(self.update_setting)
+        self.ui.chb_custom_random.stateChanged.connect(self.update_setting)
         self.ui.chb_only_starter_decks.stateChanged.connect(self.update_setting)
         self.ui.spb_mon_percent.valueChanged.connect(self.validate_balance_percentage)
         self.ui.spb_low_level_percent.valueChanged.connect(self.validate_balance_percentage)
@@ -43,7 +53,7 @@ class MainWindow(QMainWindow):
         self.ui.spb_spell_trap_percent.valueChanged.connect(self.validate_balance_percentage)
         self.ui.spb_spell_percent.valueChanged.connect(self.validate_balance_percentage)
         self.ui.spb_trap_percent.valueChanged.connect(self.validate_balance_percentage)
-        self.ui.chb_duelist_portrais.stateChanged.connect(self.update_setting)
+        self.ui.cmb_random_duelist_portraits.currentIndexChanged.connect(self.update_setting)
         self.ui.chb_link_duelists_decks.stateChanged.connect(self.update_setting)
         self.ui.chb_random_sig_cards.stateChanged.connect(self.update_setting)
         self.ui.cmb_shop_packs.currentIndexChanged.connect(self.update_setting)
@@ -52,6 +62,7 @@ class MainWindow(QMainWindow):
         self.ui.spb_min_price.valueChanged.connect(self.validate_shop_price)
         self.ui.spb_max_price.valueChanged.connect(self.validate_shop_price)
         self.ui.chb_shuffle_arenas.stateChanged.connect(self.update_setting)
+        self.ui.cmb_random_battle_packs.currentIndexChanged.connect(self.update_setting)
         self.ui.btn_run.clicked.connect(self.run_rando)
 
         # self.apply_settings()
@@ -67,7 +78,13 @@ class MainWindow(QMainWindow):
         self.ui.chb_no_xyz.setChecked(self.rando.settings.exclude_xyz_cards)
         self.ui.chb_no_pendulum.setChecked(self.rando.settings.exclude_pendulum_cards)
         self.ui.chb_no_synchro.setChecked(self.rando.settings.exclude_synchro_cards)
+        self.ui.chb_no_link.setChecked(self.rando.settings.exclude_link_cards)
+        self.ui.chb_no_union.setChecked(self.rando.settings.exclude_union_cards)
+        self.ui.chb_no_gemini.setChecked(self.rando.settings.exclude_gemini_cards)
+        self.ui.chb_no_tuner.setChecked(self.rando.settings.exclude_tuner_cards)
+        self.ui.chb_no_spirit.setChecked(self.rando.settings.exclude_spirit_cards)
         self.ui.chb_include_custom.setChecked(self.rando.settings.include_custom_decks)
+        self.ui.chb_custom_random.setChecked(self.rando.settings.random_custom_decks)
         self.ui.chb_only_starter_decks.setChecked(self.rando.settings.only_starter_decks)
         self.ui.spb_mon_percent.setValue(self.rando.settings.mon_percent)
         self.ui.spb_low_level_percent.setValue(self.rando.settings.low_level_percent)
@@ -75,7 +92,7 @@ class MainWindow(QMainWindow):
         self.ui.spb_spell_trap_percent.setValue(self.rando.settings.spell_trap_percent)
         self.ui.spb_spell_percent.setValue(self.rando.settings.spell_percent)
         self.ui.spb_trap_percent.setValue(self.rando.settings.trap_percent)
-        self.ui.chb_duelist_portrais.setChecked(self.rando.settings.random_duelist_portraits)
+        self.ui.cmb_random_duelist_portraits.setCurrentIndex(self.rando.settings.random_duelist_portraits)
         self.ui.chb_link_duelists_decks.setChecked(self.rando.settings.link_duelists_decks)
         self.ui.chb_random_sig_cards.setChecked(self.rando.settings.random_sig_cards)
         self.ui.cmb_shop_packs.setCurrentIndex(self.rando.settings.random_shop_packs)
@@ -84,6 +101,7 @@ class MainWindow(QMainWindow):
         self.ui.spb_min_price.setValue(self.rando.settings.shop_min_price)
         self.ui.spb_max_price.setValue(self.rando.settings.shop_max_price)
         self.ui.chb_shuffle_arenas.setChecked(self.rando.settings.shuffle_arenas)
+        self.ui.cmb_random_battle_packs.setCurrentIndex(self.rando.settings.random_battle_packs)
 
     def enable_options(self, val: bool):
         self.ui.txt_seed.setEnabled(val)
@@ -93,10 +111,13 @@ class MainWindow(QMainWindow):
         self.ui.grp_opt_shop.setEnabled(val)
         self.ui.grp_opt_duelists.setEnabled(val)
 
-    def enable_balancing_options(self, value):
+    def enable_deck_option_groups(self, value):
+        self.ui.grp_opt_no.setEnabled(
+            value in [RandomDeckSettings.Balanced, RandomDeckSettings.Full_Random, RandomDeckSettings.By_Type,
+                      RandomDeckSettings.Archetype])
         self.ui.grp_balance_opts.setEnabled(
             value in [RandomDeckSettings.Balanced, RandomDeckSettings.Full_Random, RandomDeckSettings.By_Type,
-                      RandomDeckSettings.Archtype])
+                      RandomDeckSettings.Archetype])
 
     def update_seed(self, value):
         if value == "":
@@ -110,7 +131,13 @@ class MainWindow(QMainWindow):
             "chb_no_xyz": "exclude_xyz",
             "chb_no_pendulum": "exclude_pendulum",
             "chb_no_synchro": "exclude_synchro",
+            "chb_no_link": "exclude_link",
+            "chb_no_union": "exclude_union",
+            "chb_no_gemini": "exclude_gemini",
+            "chb_no_tuner": "exclude_tuner",
+            "chb_no_spirit": "exclude_spirit",
             "chb_include_custom": "include_custom",
+            "chb_custom_random": "random_custom_decks",
             "chb_only_starter_decks": "only_starter_decks",
             "spb_mon_percent": "mon_percent",
             "spb_low_level_percent": "low_level_percent",
@@ -118,7 +145,7 @@ class MainWindow(QMainWindow):
             "spb_spell_trap_percent": "spell_trap_percent",
             "spb_spell_percent": "spell_percent",
             "spb_trap_percent": "trap_percent",
-            "chb_duelist_portrais": "random_duelist_portraits",
+            "cmb_random_duelist_portraits": "random_duelist_portraits",
             "chb_link_duelists_decks": "link_duelists_decks",
             "chb_random_sig_cards": "random_sig_cards",
             "cmb_shop_packs": "random_shop_packs",
@@ -127,6 +154,7 @@ class MainWindow(QMainWindow):
             "spb_min_price": "shop_min_price",
             "spb_max_price": "shop_max_price",
             "chb_shuffle_arenas": "shuffle_arenas",
+            "cmb_random_battle_packs": "random_battle_packs",
         }
         sender_name = self.sender().objectName()
         if sender_name in setting_attr_mapping:
@@ -208,3 +236,17 @@ class MainWindow(QMainWindow):
             second_box.setValue(100 - sender.value())
             self.update_setting(second_box.value())
         self.update_setting(sender.value())
+
+    def set_tooltips(self):
+        for k, v in tooltips.items():
+            if hasattr(self.ui, k):
+                widget = self.ui.__getattribute__(k)
+                widget.setWhatsThis(v)
+                widget.setToolTip(v)
+                widget.setToolTipDuration(-1)
+            lbl = f'lbl_{k[4:]}'
+            if hasattr(self.ui, lbl):
+                widget = self.ui.__getattribute__(lbl)
+                widget.setWhatsThis(v)
+                widget.setToolTip(v)
+                widget.setToolTipDuration(-1)
