@@ -59,6 +59,7 @@ class RandomizerSettings:
         self.include_custom_decks: bool = True
         self.random_custom_decks: bool = True
         self.only_starter_decks: bool = False
+        self.respect_card_limits: bool = True
         # ToDo: custom balancing options? like monster percentage etc.
         # deck balancing
         self.mon_percent: int = 50

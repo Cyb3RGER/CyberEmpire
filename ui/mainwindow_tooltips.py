@@ -1,4 +1,3 @@
-# ToDo
 tooltips = {
     'txt_seed': 'Seed used for the randomizer.\n'
                 'The same seed with the same settings will always produce the same result.\n'
@@ -25,13 +24,13 @@ tooltips = {
     'cmb_random_duelist_portraits': 'Randomize the duelists images:\n'
                                     'Off: Vanilla. (Boo! Boring!)\n'
                                     'Coherent: Try to match battle portraits and dialog images.\n'
-                                    'Chaos: Randomize battle portraits and dialog images separately.\n',
+                                    'Chaos: Randomize battle portraits and dialog images separatelyn',
     'chb_link_duelists_decks': 'Link deck and duelist rando. [Not Implemented]',
     'chb_random_sig_cards': 'Replace each signature card with a random one.',
     'cmb_shop_packs': 'Randomize Shop Packs:\n'
                       'Off: Vanilla. (Boo! Boring!)\n'
                       'Shuffled: Shuffle the packs around.\n'
-                      'Randomized: Each pack is randomly generated.\n',
+                      'Randomized: Each pack is randomly generated.',
     'chb_shop_portraits': 'Shuffle the Shop Pack Portraits around.',
     'chb_shop_prices': 'Randomize the Shop prices.',
     'spb_min_price': 'Minimum price for the random price.',
@@ -40,6 +39,6 @@ tooltips = {
     'cmb_random_battle_packs': 'Randomize battle packs: [Not Implemented]\n'
                                'Off: Vanilla. (Boo! Boring!)\n'
                                'Shuffled: Shuffle the packs around.\n'
-                               'Randomized: Each pack is randomly generated.\n',
+                               'Randomized: Each pack is randomly generated.',
 
 }
