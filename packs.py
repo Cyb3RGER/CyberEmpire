@@ -1,4 +1,5 @@
 import os
+from statistics import mean
 from typing import IO
 
 from io_helper import read_int32, read_int64, read_string_u8, read_string_u16, write_int32, write_int64, \
@@ -104,7 +105,7 @@ class BattlePack:
     def fix_pointers(self):
         pos = self.get_size()
         for i in range(0, self.pack_count):
-            self.pack_ptrs = pos
+            self.pack_ptrs.append(pos)
             pos += self.packs[i].get_size()
 
     def write(self, file_path):
@@ -112,9 +113,9 @@ class BattlePack:
         with open(file_path, mode='wb') as f:
             write_int64(f, self.pack_count)
             for i in range(0, self.pack_count):
-                write_int64(f, self.pack_count)
+                write_int64(f, self.pack_ptrs[i])
             for i in range(0, self.pack_count):
-                self.packs[i].write()
+                self.packs[i].write(f)
 
 
 class BattlePackCards:
@@ -164,3 +165,28 @@ class Pack:
                 write_int16(f, self.common_ids[i])
             for i in range(0, self.rare_count):
                 write_int16(f, self.rare_ids[i])
+
+
+# def print_stuff(*args):
+#     pack_cnts = []
+#     for arg in args:
+#         _, name = os.path.split(arg)
+#         pack = BattlePack(name)
+#         pack.load(arg)
+#         avg_ = mean([p.count for p in pack.packs])
+#         min_ = min([p.count for p in pack.packs])
+#         max_ = max([p.count for p in pack.packs])
+#         pack_cnts += [p.count for p in pack.packs]
+#         print(name, avg_, max_, min_)
+#     avg_ = mean([p for p in pack_cnts])
+#     min_ = min([p for p in pack_cnts])
+#     max_ = max([p for p in pack_cnts])
+#     print("sum", avg_, max_, min_)
+#
+# def main():
+#     print_stuff(f'extracted/packs.zib/bpack_BattlePack1.bin', f'extracted/packs.zib/bpack_BattlePack2.bin',
+#                 f'extracted/packs.zib/bpack_BattlePack2Round2.bin')
+#
+#
+# if __name__ == '__main__':
+#     main()

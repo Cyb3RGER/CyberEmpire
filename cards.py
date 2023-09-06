@@ -205,18 +205,19 @@ class CardHelper:
             list[CardProps]:
         if population is None:
             population = self.get_included_cards()
+        respect_limits = self.respect_card_limits and limit > 0
         assert len(population) > 0, f'how? {population}, {k}'
         cards = random.choices(population, k=k)
         # check for limit
         counter = Counter(cards)
-        while self.respect_card_limits and any(
+        while respect_limits and any(
                 v > (limit if key.id_ not in self.card_limits else min(limit, self.card_limits[key.id_])) for key, v in
                 counter.items()):
             reroll_count = 0
             for key, v in counter.items():
                 limit_actual = (limit if key.id_ not in self.card_limits else min(limit, self.card_limits[key.id_]))
-                print(f'rerolling {key.id_} with limit {limit_actual} ({limit_actual},'
-                      f' {self.card_limits[key.id_] if key.id_ in self.card_limits else -1})')
+                print(f'rerolling {key.id_} with limit {limit_actual} (limit param: {limit}, '
+                      f'card limit: {self.card_limits[key.id_] if key.id_ in self.card_limits else None})')
                 if v <= limit_actual:
                     continue
                 # remove card that is over limit from population
@@ -231,7 +232,7 @@ class CardHelper:
             # reroll cards
             cards += random.choices(population, k=reroll_count)
             counter = Counter(cards)
-        assert len(cards) == k, f"oops, looks like we fucked up the re-roll with limits: {len(cards)} != {k}"
+        assert len(cards) == k, f"oops, looks like we fucked up the reroll with limits: {len(cards)} != {k}"
         return cards
 
     def get_deck_from_custom_deck(self, custom_deck: CustomDeck, random: random.Random) -> Deck:

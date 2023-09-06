@@ -13,7 +13,7 @@ from decks import Deck, DeckData
 from extract import extract
 from gen_card_props import CardProps
 from mappers import *
-from packs import PackDefData, Pack
+from packs import PackDefData, Pack, BattlePack, BattlePackCards
 from seed_word_tbl import word_tbl
 from settings import RandomizerSettings, RandomDeckSettings, RandomShopPackSettings, RandomBattlePacksSettings, \
     RandomDuelistPortraitSettings
@@ -47,6 +47,7 @@ class Randomizer:
         self.card_props: list[CardProps] = []
         self.decks: dict[str, Deck] = {}
         self.random_shop_packs: dict[str, Pack] = {}
+        self.random_battle_packs: dict[str, BattlePack] = {}
 
         self.randomized_sig_cards: list[(str, str, str)] = []
         self.shuffled_arena_files: dict[str, str] = {}
@@ -207,6 +208,10 @@ class Randomizer:
                 # we need to make sure battle packs are also in the compress folder, if they are not random,
                 # when we change packs.zib content, otherwise the compress script will not repack them
                 self.set_default_battle_packs()
+            if self.settings.random_battle_packs == RandomBattlePacksSettings.Shuffled:
+                self.shuffle_battle_packs()
+            elif self.settings.random_battle_packs == RandomBattlePacksSettings.Randomized:
+                self.randomize_battle_packs()
         except Exception as e:
             yield -1, e, traceback.format_exc()
 
@@ -315,8 +320,13 @@ class Randomizer:
                 self.apply_shuffled_files('busts.zib', self.shuffled_bust_files)
                 self.apply_shuffled_files('pdui/dialog_chars', self.shuffled_dialog_files)
                 self.char_dfymoo.write(f'{compress_path}/pdui/chars.dfymoo')
+            # battle packs
             if self.settings.random_battle_packs == RandomBattlePacksSettings.Off and self.settings.random_shop_packs != RandomShopPackSettings.Off:
                 self.apply_shuffled_files('packs.zib', self.shuffled_battle_packs)
+            if self.settings.random_battle_packs == RandomBattlePacksSettings.Shuffled:
+                self.apply_shuffled_files('packs.zib', self.shuffled_battle_packs)
+            elif self.settings.random_battle_packs == RandomBattlePacksSettings.Randomized:
+                self.apply_random_battle_pack_files(self.shuffled_battle_packs)
             # finally we compress the files together for the game to use
             compress(f'{compress_path}', f'{self.get_out_path()}/YGO_2020', f'YGO_2020')
         self.write_log()
@@ -550,6 +560,17 @@ class Randomizer:
             self.random_shop_packs[pack.name] = pack
             self.shuffled_shop_packs[v] = pack.name
 
+    def shuffle_battle_packs(self):
+        battle_packs = self.get_battle_pack_file_list()
+        self.shuffled_battle_packs = self.shuffle_list(battle_packs)
+
+    def randomize_battle_packs(self):
+        battle_pack_files = self.get_battle_pack_file_list()
+        for i, v in enumerate(battle_pack_files):
+            pack = self.create_random_battle_pack(i)
+            self.random_battle_packs[pack.name] = pack
+            self.shuffled_battle_packs[v] = pack.name
+
     def get_battle_pack_file_list(self):
         result: list[str] = []
         for entry in os.scandir(f"{extract_path}/packs.zib/"):
@@ -563,6 +584,17 @@ class Randomizer:
             if entry.name.startswith('packdata') and entry.name.endswith('.bin'):
                 result.append(entry.name)
         return result
+
+    def create_random_battle_pack(self, i: int) -> BattlePack:
+        battle_pack = BattlePack(f'random_battle_pack_{i}.bin')
+        battle_pack.pack_count = self.random.randint(5, 7)
+        for i in range(0, battle_pack.pack_count):
+            cards = BattlePackCards()
+            cards.count = self.random.randint(30, 220)
+            cards.cards = [v.id_ for v in self.card_helper.get_random_cards(self.random, k=cards.count, limit=0)]
+            battle_pack.packs.append(cards)
+        battle_pack.fix_pointers()
+        return battle_pack
 
     def create_random_shop_pack(self, i: int):
         pack = Pack(f'random_pack_{i}.bin')
@@ -580,6 +612,16 @@ class Randomizer:
         for k, v in files.items():
             dst = f'{dst_folder}/{k}'
             deck = self.random_shop_packs[v]
+            print(f'writing {dst}')
+            deck.write(dst)
+
+    def apply_random_battle_pack_files(self, files):
+        dst_folder = f'{compress_path}/packs.zib'
+        if not os.path.exists(dst_folder):
+            os.mkdir(dst_folder)
+        for k, v in files.items():
+            dst = f'{dst_folder}/{k}'
+            deck = self.random_battle_packs[v]
             print(f'writing {dst}')
             deck.write(dst)
 
