@@ -1,8 +1,10 @@
 type,id
 xyz,9572
 xyz,9779
+xyz,9877
 xyz,10203
 xyz,10230
+xyz,10370
 xyz,10447
 xyz,10495
 xyz,10675
@@ -19,6 +21,7 @@ synchro,7743
 synchro,8988
 synchro,9080
 synchro,9241
+synchro,9987
 synchro,11240
 synchro,11620
 synchro,12894
@@ -27,6 +30,7 @@ synchro,14591
 synchro,14755
 synchro,14872
 tuner,8718
+tuner,8794
 tuner,9501
 tuner,10640
 tuner,14143
@@ -49,3 +53,4 @@ link,13625
 link,13786
 link,13873
 link,14516
+link,14625
