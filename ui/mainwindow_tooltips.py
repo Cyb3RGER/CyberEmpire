@@ -24,7 +24,7 @@ tooltips = {
     'cmb_random_duelist_portraits': 'Randomize the duelists images:\n'
                                     'Off: Vanilla. (Boo! Boring!)\n'
                                     'Coherent: Try to match battle portraits and dialog images.\n'
-                                    'Chaos: Randomize battle portraits and dialog images separatelyn',
+                                    'Chaos: Randomize battle portraits and dialog images separately',
     'chb_link_duelists_decks': 'Link deck and duelist rando. [Not Implemented]',
     'chb_random_sig_cards': 'Replace each signature card with a random one.',
     'cmb_shop_packs': 'Randomize Shop Packs:\n'
