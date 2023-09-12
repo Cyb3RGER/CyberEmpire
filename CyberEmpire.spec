@@ -8,7 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('README.md', '.'), ('data', 'data'), ('LICENSE','.'), ('custom_decks/format.md','custom_decks')],
+    datas=[('README.md', '.'), ('data', 'data'), ('LICENSE','.'), ('custom_decks','custom_decks')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
