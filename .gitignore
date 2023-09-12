@@ -10,7 +10,7 @@ settings.json
 /extracted/
 /out/
 /to_compress/
-/custom_decks/*
+/custom_decks/test*.txt
 !/custom_decks/*.md
 /build/
 /dist/
