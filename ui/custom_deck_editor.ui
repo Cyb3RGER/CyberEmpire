@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>636</height>
+    <width>1171</width>
+    <height>659</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,16 +46,6 @@
        </property>
        <property name="readOnly">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QPlainTextEdit" name="txt_source">
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="backgroundVisible">
-        <bool>false</bool>
        </property>
       </widget>
      </item>

@@ -23,7 +23,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(1024, 636)
+        Dialog.resize(1171, 659)
         Dialog.setStyleSheet(u"QTextEdit {\n"
 "	background: rgb(30,31,34)\n"
 "}")
@@ -46,13 +46,6 @@ class Ui_Dialog(object):
         self.txt_result.setReadOnly(True)
 
         self.gridLayout.addWidget(self.txt_result, 0, 1, 2, 1)
-
-        self.txt_source = QPlainTextEdit(Dialog)
-        self.txt_source.setObjectName(u"txt_source")
-        self.txt_source.setStyleSheet(u"")
-        self.txt_source.setBackgroundVisible(False)
-
-        self.gridLayout.addWidget(self.txt_source, 1, 0, 1, 1)
 
         self.txt_example = QPlainTextEdit(Dialog)
         self.txt_example.setObjectName(u"txt_example")

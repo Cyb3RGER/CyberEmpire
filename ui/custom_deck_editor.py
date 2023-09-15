@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QDialog, QFileDialog, QDialogButtonBox
 import custom_decks
 from cards import CardHelper
 from settings import RandomizerSettings
+from ui.CodeEditor import CodeEditor
 from ui.TextEditLogHandler import TextEditLogHandler
 from ui.ui_custom_deck_editor import Ui_Dialog
 from utils import prog_name
@@ -34,6 +35,12 @@ class CustomDeckEditor(QDialog):
         self.parser.logger = self.logger
         self.parser.logger.addHandler(self.handler)
         self.current_file = None
+        self.ui.txt_source = CodeEditor(self)
+        self.ui.txt_source.setObjectName(u"txt_source")
+        self.ui.txt_source.setStyleSheet(u"")
+        self.ui.txt_source.setBackgroundVisible(False)
+        self.ui
+        self.ui.gridLayout.addWidget(self.ui.txt_source, 1, 0, 1, 1)
 
         self.ui.btn_file.clicked.connect(self.select_file)
         self.ui.txt_source.textChanged.connect(self.update_log)
@@ -49,7 +56,6 @@ class CustomDeckEditor(QDialog):
             return
         result = self.card_helper.get_deck_from_custom_deck(self.deck, random.Random())
         self.ui.txt_example.setPlainText(str(result))
-
 
     def save_file(self):
         if not self.current_file:

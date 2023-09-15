@@ -41,15 +41,15 @@ class CustomDeck:
 
     def validate(self, parser):
         # make sure groups fit in deck
-        main_group_count = sum([i.count*i.factor for i in self.main_ids if type(i) == CustomDeckCardGroup])
+        main_group_count = sum([i.count * i.factor for i in self.main_ids if type(i) == CustomDeckCardGroup])
         if self.main_count < main_group_count:
             raise ParseException(parser,
                                  f'card groups in Main Deck do not fit. There are {main_group_count - self.main_count} too many cards from groups.')
-        extra_group_count = sum([i.count*i.factor for i in self.extra_ids if type(i) == CustomDeckCardGroup])
+        extra_group_count = sum([i.count * i.factor for i in self.extra_ids if type(i) == CustomDeckCardGroup])
         if self.extra_count < extra_group_count:
             raise ParseException(parser,
                                  f'card groups in Extra Deck do not fit. There are {extra_group_count - self.extra_count} too many cards from groups.')
-        side_group_count = sum([i.count*i.factor for i in self.side_ids if type(i) == CustomDeckCardGroup])
+        side_group_count = sum([i.count * i.factor for i in self.side_ids if type(i) == CustomDeckCardGroup])
         if self.extra_count < extra_group_count:
             raise ParseException(parser,
                                  f'card groups in Side Deck do not fit. There are {side_group_count - self.side_count} too many cards from groups.')
@@ -57,6 +57,7 @@ class CustomDeck:
 
     def __str__(self):
         result = ''
+
         def _str_ids(ids):
             result = ''
             for i in ids:
@@ -210,8 +211,7 @@ class CustomDeckParser:
         try:
             return int(line.split('=')[-1].strip())
         except:
-            self.logger.warning('invalid count. using 0 instead.')
-            return 0
+            raise ParseException(self, 'invalid count.')
 
     def get_count_and_factor(self, line) -> (int, int):
         try:
@@ -221,9 +221,7 @@ class CustomDeckParser:
                 x_pos = line.find('x')
                 return self.get_count(line[:x_pos]), int(line.split('x')[-1].strip())
         except:
-            self.logger.warning('invalid factor. using 1 instead.')
-            return 0, 1
-
+            raise ParseException(self, 'invalid factor.')
 
 
 class ParseException(Exception):
