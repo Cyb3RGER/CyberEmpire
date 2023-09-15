@@ -3,7 +3,7 @@ import random
 from collections import Counter
 from typing import Optional
 
-from custom_decks import CustomDeck
+from custom_decks import CustomDeck, CustomDeckCardGroup
 from decks import Deck
 from mappers import effect_name_mapper, attribute_name_mapper, spell_type_name_mapper, type_name_mapper, \
     monster_name_mapper
@@ -238,13 +238,31 @@ class CardHelper:
     def get_deck_from_custom_deck(self, custom_deck: CustomDeck, random: random.Random) -> Deck:
         deck = Deck(f'custom_{custom_deck.name}')
         deck.main_count = custom_deck.main_count
-        deck.main_ids = self._get_id_list(random, custom_deck.main_ids, custom_deck.main_count, custom_deck.filler_ids)
+        deck.main_ids = self._get_deck_part(random, custom_deck.main_ids, custom_deck.main_count,
+                                            custom_deck.filler_ids)
         deck.extra_count = custom_deck.extra_count
-        deck.extra_ids = self._get_id_list(random, custom_deck.extra_ids, custom_deck.extra_count,
-                                           custom_deck.filler_ids)
+        deck.extra_ids = self._get_deck_part(random, custom_deck.extra_ids, custom_deck.extra_count,
+                                             custom_deck.filler_ids)
         deck.side_count = custom_deck.side_count
-        deck.side_ids = self._get_id_list(random, custom_deck.side_ids, custom_deck.side_count, custom_deck.filler_ids)
+        deck.side_ids = self._get_deck_part(random, custom_deck.side_ids, custom_deck.side_count,
+                                            custom_deck.filler_ids)
         return deck
+
+    def _get_deck_part(self, random: random.Random, id_list: list[int | CustomDeckCardGroup], count: int,
+                       filler: list[int]) -> list[int]:
+        result: list[int] = []
+        groups = [i for i in id_list if type(i) == CustomDeckCardGroup]
+        ids = [i for i in id_list if type(i) != CustomDeckCardGroup]
+        # pick from groups first as they are fixed size
+        for group in groups:
+            result += self._get_id_list(random, group.ids, group.count, []) * group.factor
+        if len(result) > count:
+            # this should be caught by parser
+            raise 'too many cards from groups in deck'
+        elif len(result) < count:
+            result += self._get_id_list(random, ids, count-len(result), filler)
+        assert len(result) == count, 'count doesnt match result length'
+        return result
 
     def _get_id_list(self, random: random.Random, id_list: list[int], count: int, filler: list[int]) -> list[int]:
         result: list[int]
@@ -256,5 +274,6 @@ class CardHelper:
             if len(filler) > 0:
                 result += random.choices(filler, k=count - len(result))
             else:
-                raise 'not enough cards to fill deck'
+                result += random.choices(id_list, k=count - len(result))
+        assert len(result) == count, 'count doesnt match result length'
         return result

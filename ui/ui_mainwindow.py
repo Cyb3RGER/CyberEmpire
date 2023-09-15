@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainwindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.2
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -29,6 +29,10 @@ class Ui_MainWindow(object):
         MainWindow.resize(1000, 627)
         self.action_copy_game_files = QAction(MainWindow)
         self.action_copy_game_files.setObjectName(u"action_copy_game_files")
+        self.action_validate_custom = QAction(MainWindow)
+        self.action_validate_custom.setObjectName(u"action_validate_custom")
+        self.action_converter = QAction(MainWindow)
+        self.action_converter.setObjectName(u"action_converter")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -504,13 +508,18 @@ class Ui_MainWindow(object):
         self.menubar.setGeometry(QRect(0, 0, 1000, 22))
         self.menuSetup = QMenu(self.menubar)
         self.menuSetup.setObjectName(u"menuSetup")
+        self.menuTools = QMenu(self.menubar)
+        self.menuTools.setObjectName(u"menuTools")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
         self.menubar.addAction(self.menuSetup.menuAction())
+        self.menubar.addAction(self.menuTools.menuAction())
         self.menuSetup.addAction(self.action_copy_game_files)
+        self.menuTools.addAction(self.action_validate_custom)
+        self.menuTools.addAction(self.action_converter)
 
         self.retranslateUi(MainWindow)
 
@@ -523,6 +532,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.action_copy_game_files.setText(QCoreApplication.translate("MainWindow", u"Copy game files", None))
+        self.action_validate_custom.setText(QCoreApplication.translate("MainWindow", u"Edit custom deck", None))
+        self.action_converter.setText(QCoreApplication.translate("MainWindow", u"Card ID Converter", None))
         self.grp_opt_duelists.setTitle(QCoreApplication.translate("MainWindow", u"Duelists", None))
         self.lbl_random_duelist_portraits.setText(QCoreApplication.translate("MainWindow", u"Randomize Duelist Portraits", None))
         self.lbl_link_duelists_decks.setText(QCoreApplication.translate("MainWindow", u"Randomize Portraits with Decks", None))
@@ -597,5 +608,6 @@ class Ui_MainWindow(object):
         self.chb_shuffle_arenas.setText("")
         self.lbl_random_battle_packs.setText(QCoreApplication.translate("MainWindow", u"Randomize Battle Packs", None))
         self.menuSetup.setTitle(QCoreApplication.translate("MainWindow", u"Setup", None))
+        self.menuTools.setTitle(QCoreApplication.translate("MainWindow", u"Tools", None))
     # retranslateUi
 

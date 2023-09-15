@@ -1,6 +1,9 @@
 import os.path
 import random
+from datetime import datetime
 from enum import IntEnum
+from typing import Optional
+import logging
 
 from mappers import card_name_mapper
 
@@ -14,17 +17,67 @@ class ParsingMode(IntEnum):
     EOF = 5
 
 
-class CustomDeck:
-    def __init__(self, name: str, main_count: int, main_ids: list[int], extra_count: int, extra_ids: list[int],
-                 side_count: int, side_ids: list[int], filler_ids: list[int]):
+class CustomDeckCardGroup:
+    def __init__(self, name: str, count: int, factor: int = 1):
         self.name: str = name
-        self.main_count: int = main_count
-        self.main_ids: list[int] = main_ids
-        self.extra_count: int = extra_count
-        self.extra_ids: list[int] = extra_ids
-        self.side_count: int = side_count
-        self.side_ids: list[int] = side_ids
-        self.filler_ids: list[int] = filler_ids
+        self.count: int = count
+        self.factor: int = factor
+        self.ids: list[int] = []
+
+    def __str__(self):
+        return f'[{self.name} = {self.count}: {self.ids}]'
+
+
+class CustomDeck:
+    def __init__(self, name: str):
+        self.name: str = name
+        self.main_count: int = 0
+        self.main_ids: list[int | CustomDeckCardGroup] = []
+        self.extra_count: int = 0
+        self.extra_ids: list[int | CustomDeckCardGroup] = []
+        self.side_count: int = 0
+        self.side_ids: list[int | CustomDeckCardGroup] = []
+        self.filler_ids: list[int] = []
+
+    def validate(self, parser):
+        # make sure groups fit in deck
+        main_group_count = sum([i.count*i.factor for i in self.main_ids if type(i) == CustomDeckCardGroup])
+        if self.main_count < main_group_count:
+            raise ParseException(parser,
+                                 f'card groups in Main Deck do not fit. There are {main_group_count - self.main_count} too many cards from groups.')
+        extra_group_count = sum([i.count*i.factor for i in self.extra_ids if type(i) == CustomDeckCardGroup])
+        if self.extra_count < extra_group_count:
+            raise ParseException(parser,
+                                 f'card groups in Extra Deck do not fit. There are {extra_group_count - self.extra_count} too many cards from groups.')
+        side_group_count = sum([i.count*i.factor for i in self.side_ids if type(i) == CustomDeckCardGroup])
+        if self.extra_count < extra_group_count:
+            raise ParseException(parser,
+                                 f'card groups in Side Deck do not fit. There are {side_group_count - self.side_count} too many cards from groups.')
+        # ToDo:
+
+    def __str__(self):
+        result = ''
+        def _str_ids(ids):
+            result = ''
+            for i in ids:
+                result += '\t'
+                if type(i) == type(CustomDeckCardGroup):
+                    result += f'{i.name} = {i.count}:\n'
+                    for j in i.ids:
+                        result += f'\t\t{j}\n'
+                else:
+                    result += f'{i}\n'
+            return result
+
+        result += f'Main Deck = {self.main_count}:\n'
+        result += _str_ids(self.main_ids)
+        result += f'Extra Deck = {self.extra_count}:\n'
+        result += _str_ids(self.extra_ids)
+        result += f'Side Deck = {self.side_count}:\n'
+        result += _str_ids(self.side_ids)
+        result += f'Filler:\n'
+        result += _str_ids(self.filler_ids)
+        return result
 
 
 class CustomDeckParser:
@@ -32,74 +85,106 @@ class CustomDeckParser:
         self.file_name: str = ""
         self.line_num: int = 0
         self.mode: ParsingMode = ParsingMode.Init
-    def load(self, path) -> CustomDeck:
+        self.logger = logging.getLogger('cyber_empire.custom_deck_parser')
+
+    def parse(self, data: str, file_name: Optional[str] = None) -> CustomDeck:
+        if file_name:
+            self.file_name = file_name
         self.mode = ParsingMode.Init
-        main_count = 0
-        main_ids = []
-        extra_count = 0
-        extra_ids = []
-        side_count = 0
-        side_ids = []
-        filler_ids = []
-        _, self.file_name = os.path.split(path)
         main_found = False
         extra_found = False
         side_found = False
         filler_found = False
+        current_group: Optional[CustomDeckCardGroup] = None
+        deck = CustomDeck(os.path.splitext(self.file_name)[0])
+        lines = data.splitlines()
         try:
-            with open(path, mode='r') as f:
-                lines = f.read().splitlines()
             self.line_num = 0
             for line in lines:
+                line = line.strip()
                 self.line_num += 1
-                if line.lower().startswith('main'):
-                    if main_found:
-                        raise ParseException(self, "Main Deck should only appear once")
-                    main_found = True
-                    self.mode = ParsingMode.MainDeck
-                    main_count = self.get_count(line)
-                elif line.lower().startswith('extra'):
-                    if extra_found:
-                        raise ParseException(self, "Extra Deck should only appear once")
-                    extra_found = True
-                    self.mode = ParsingMode.ExtraDeck
-                    extra_count = self.get_count(line)
-                elif line.lower().startswith('side'):
-                    if side_found:
-                        raise ParseException(self, "Side Deck should only appear once")
-                    side_found = True
-                    self.mode = ParsingMode.SideDeck
-                    side_count = self.get_count(line)
-                elif line.lower().startswith('filler'):
-                    if filler_found:
-                        raise ParseException(self, "Side Deck should only appear once")
-                    filler_found = True
-                    self.mode = ParsingMode.Filler
-                else:
+                if '=' in line or line.startswith('-'):
+                    if current_group is not None:
+                        if current_group.count == 0:
+                            self.logger.warning(
+                                f'{self.file_name}:{self.line_num}: ignoring card group "{current_group.name}" with count 0 as it has no effect.')
+                        elif len(current_group.ids) <= 0:
+                            self.logger.warning(
+                                f'{self.file_name}:{self.line_num}: ignoring empty card group "{current_group.name}".')
+                        else:
+                            if self.mode == ParsingMode.MainDeck:
+                                deck.main_ids.append(current_group)
+                            elif self.mode == ParsingMode.ExtraDeck:
+                                deck.extra_ids.append(current_group)
+                            elif self.mode == ParsingMode.SideDeck:
+                                deck.side_ids.append(current_group)
+                        current_group = None
+                if '=' in line:
+                    split = line.split('=')
+                    if split[0].lower().strip() == 'main deck':
+                        if main_found:
+                            raise ParseException(self, "Main Deck should only appear once")
+                        main_found = True
+                        self.mode = ParsingMode.MainDeck
+                        deck.main_count = self.get_count(line)
+                    elif split[0].lower().strip() == 'extra deck':
+                        if extra_found:
+                            raise ParseException(self, "Extra Deck should only appear once")
+                        extra_found = True
+                        self.mode = ParsingMode.ExtraDeck
+                        deck.extra_count = self.get_count(line)
+                    elif split[0].lower().strip() == 'side deck':
+                        if side_found:
+                            raise ParseException(self, "Side Deck should only appear once")
+                        side_found = True
+                        self.mode = ParsingMode.SideDeck
+                        deck.side_count = self.get_count(line)
+                    elif split[0].lower().strip() == 'filler':
+                        if filler_found:
+                            raise ParseException(self, "Filler should only appear once")
+                        filler_found = True
+                        self.mode = ParsingMode.Filler
+                    elif self.mode in [ParsingMode.MainDeck, ParsingMode.ExtraDeck, ParsingMode.SideDeck]:
+                        group_name = self.get_name(line)
+                        group_count, group_factor = self.get_count_and_factor(line)
+                        current_group = CustomDeckCardGroup(group_name, group_count, group_factor)
+                elif line.isnumeric():
                     id_ = self.get_id(line)
                     if id_ is not None:
+                        if current_group is not None:
+                            current_group.ids.append(id_)
                         if self.mode == ParsingMode.MainDeck:
-                            main_ids.append(id_)
+                            deck.main_ids.append(id_)
                         elif self.mode == ParsingMode.ExtraDeck:
-                            extra_ids.append(id_)
+                            deck.extra_ids.append(id_)
                         elif self.mode == ParsingMode.SideDeck:
-                            side_ids.append(id_)
+                            deck.side_ids.append(id_)
                         elif self.mode == ParsingMode.Filler:
-                            filler_ids.append(id_)
-        except:
+                            deck.filler_ids.append(id_)
+                # else:
+                #     raise ParseException(self, f'invalid line: {line}')
+            # validate
+            self.mode = ParsingMode.EOF
+            deck.validate(self)
+        except ParseException as e:
+            self.logger.error(f'{e}')
+            raise
+        except Exception:
+            self.logger.exception('')
             raise
         finally:
             self.mode = ParsingMode.EOF
-        # validate
-        # ToDo: should we enforce card limits here??
-        if main_count > len(main_ids) and len(filler_ids) == 0:
-            raise ParseException(self, "not enough cards to fill Main Deck")
-        if extra_count > len(extra_ids) and len(filler_ids) == 0:
-            raise ParseException(self, "not enough cards to fill Extra Deck")
-        if side_count > len(side_ids) and len(filler_ids) == 0:
-            raise ParseException(self, "not enough cards to fill Side Deck")
-        return CustomDeck(os.path.splitext(self.file_name)[0], main_count, main_ids, extra_count, extra_ids, side_count,
-                          side_ids, filler_ids)
+        return deck
+
+    def load(self, path: str) -> CustomDeck:
+        try:
+            _, self.file_name = os.path.split(path)
+            with open(path, mode='r') as f:
+                data = f.read()
+            return self.parse(data)
+        except IOError:
+            self.logger.exception('')
+            raise
 
     def get_id(self, line):
         if line.strip() == '':
@@ -115,11 +200,30 @@ class CustomDeckParser:
         except:
             raise ParseException(self, f'invalid card id {line}')
 
-    def get_count(self, line):
+    def get_name(self, line) -> str:
+        val = line.split('=')[0].strip()
+        if val == '':
+            self.logger.warning(f"{self.file_name}:{self.line_num}: missing group name")
+        return val
+
+    def get_count(self, line) -> int:
         try:
             return int(line.split('=')[-1].strip())
         except:
+            self.logger.warning('invalid count. using 0 instead.')
             return 0
+
+    def get_count_and_factor(self, line) -> (int, int):
+        try:
+            if 'x' not in line:
+                return self.get_count(line), 1
+            else:
+                x_pos = line.find('x')
+                return self.get_count(line[:x_pos]), int(line.split('x')[-1].strip())
+        except:
+            self.logger.warning('invalid factor. using 1 instead.')
+            return 0, 1
+
 
 
 class ParseException(Exception):
@@ -136,7 +240,12 @@ class ParseException(Exception):
 
 
 if __name__ == '__main__':
+    from logger import setup_logging
+
+    setup_logging()
     parser = CustomDeckParser()
-    custom_deck = parser.load(f'custom_decks/ultimate_reduction.txt')
-    deck = custom_deck.get_deck(random.Random())
-    deck.print()
+    custom_deck = parser.load(f'custom_decks/test_groups.txt')
+    print(custom_deck)
+    print('done')
+    # deck = custom_deck.get_deck(random.Random())
+    # deck.print()

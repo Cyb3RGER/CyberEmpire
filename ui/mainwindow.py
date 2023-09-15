@@ -1,9 +1,13 @@
+import logging
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QProgressDialog, QMessageBox
 
 from randomizer import Randomizer
 from settings import RandomDeckSettings, RandomShopPackSettings, RandomBattlePacksSettings, \
     RandomDuelistPortraitSettings
+from ui.card_id_converter import CardIDConverter
+from ui.custom_deck_editor import CustomDeckEditor
 from ui.mainwindow_tooltips import tooltips
 from ui.ui_mainwindow import Ui_MainWindow
 from utils import prog_name
@@ -12,6 +16,7 @@ from utils import prog_name
 class MainWindow(QMainWindow):
     def __init__(self, args):
         super().__init__()
+        self.logger = logging.getLogger('cyber_empire.ui.mainwindow')
         self.rando = Randomizer()
         self.rando.setup_from_args(args)
         self.ui = Ui_MainWindow()
@@ -33,6 +38,8 @@ class MainWindow(QMainWindow):
 
         # connect slots
         self.ui.action_copy_game_files.triggered.connect(self.game_path_browse)
+        self.ui.action_validate_custom.triggered.connect(self.open_validator)
+        self.ui.action_converter.triggered.connect(self.open_converter)
         self.ui.txt_seed.textChanged.connect(self.update_seed)
         self.ui.cmb_decks.currentIndexChanged.connect(self.update_setting)
         self.ui.cmb_decks.currentIndexChanged.connect(self.enable_deck_option_groups)
@@ -170,7 +177,16 @@ class MainWindow(QMainWindow):
             if len(name_split) >= 1 and name_split[0] in type_mapping:
                 attr_value = type_mapping[name_split[0]](value)
                 self.rando.settings.__setattr__(attr_name, attr_value)
-                print(attr_name, value, attr_value)
+                self.logger.debug(attr_name, value, attr_value)
+
+    def open_validator(self):
+        self.editor = CustomDeckEditor()
+        self.editor.open()
+
+    def open_converter(self):
+        self.converter = CardIDConverter()
+        self.converter.open()
+
 
     def game_path_browse(self):
         dialog = QFileDialog(self)
@@ -195,6 +211,7 @@ class MainWindow(QMainWindow):
                 err = True
                 err_box = QMessageBox()
                 err_box.setText(f"An error occurred:\n{i[1]}\n{i[2]}")
+                self.logger.error(f"An error occurred:\n{i[1]}\n{i[2]}")
                 err_box.exec()
                 gen.close()
                 break

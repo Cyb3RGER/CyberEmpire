@@ -1,2 +1,3 @@
 PySide6>=6.5.2
+pyside6-utils>=1.2.2
 pyinstaller>=5.13.1

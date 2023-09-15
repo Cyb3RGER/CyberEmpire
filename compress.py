@@ -6,7 +6,8 @@
 
 #################################################
 import argparse
-
+import logging
+logger = logging.getLogger('cyber_empire.compress')
 
 def compress(src, dest, use=None, verbose=False):
     if not use:
@@ -50,7 +51,7 @@ def compress(src, dest, use=None, verbose=False):
                             for sub_file in sub_files:
                                 if (i + 1) % 100 == 0:
                                     if verbose:
-                                        print(f"\t{i + 1:>5d} / {file_cnt:<5d}")
+                                        logger.debug(f"\t{i + 1:>5d} / {file_cnt:<5d}")
                                 with open(f"{path}\\{sub_file}", "rb") as f2:
                                     sub_fd = f2.read()
                                 fname = bytes(sub_file, "utf8")
@@ -71,7 +72,7 @@ def compress(src, dest, use=None, verbose=False):
                                 i += 1
                             del sub_fd
                         if verbose:
-                            print(f"\t{file_cnt:>5d} / {file_cnt:<5d}")
+                            logger.debug(f"\t{file_cnt:>5d} / {file_cnt:<5d}")
                         tmp_toc += bytes(0x10)
                         # path = "".join(root.replace("_zib", ".zib").split("\\")[1:])
                         path = "\\".join(path.split("\\")[1:])
@@ -99,7 +100,7 @@ def compress(src, dest, use=None, verbose=False):
                             total_write_size += 0x4 - (total_write_size % 0x4)
                 else:
                     if verbose:
-                        print(path)
+                        logger.debug(path)
                     if os.path.exists(path):
                         with open(path, "rb") as f2:
                             sub_fd = f2.read()
@@ -116,7 +117,7 @@ def compress(src, dest, use=None, verbose=False):
                         total_write_size += 0x4 - (total_write_size % 0x4)
                     del sub_fd
     if verbose:
-        print(f"Done!")
+        logger.debug(f"Done!")
     with open(dest + ".toc", "w", newline="\n") as f:
         f.write("\n".join(toc))
         f.write("\n")

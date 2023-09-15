@@ -1,6 +1,6 @@
 import argparse
-import asyncio
 
+import logger
 import ui
 from randomizer import Randomizer
 from utils import prog_name
@@ -21,6 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--placement-folder', '--placement',
                         help='do not create output other then a log file')
     args = parser.parse_args()
+    logger.setup_logging()
     if args.no_gui:
         rando = Randomizer()
         rando.setup_from_args(args, True)

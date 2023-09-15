@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import shutil
@@ -39,6 +40,7 @@ class Randomizer:
     CONFIG_PATH: str = "config.json"
 
     def __init__(self):
+        self.logger = logging.getLogger('cyber_empire')
         self.pack_wrappers_dfymoo: Dfymoo | None = None
         self.char_dfymoo: Dfymoo | None = None
         self.pack_data: PackDefData | None = None
@@ -70,7 +72,7 @@ class Randomizer:
         self.seed: str | None = None
         self.random: random.Random = random.Random(self.seed)
 
-        print(prog_name)
+        self.logger.info(prog_name)
 
     def game_path_is_valid(self, val) -> bool:
         return val is not None and os.path.exists(val) and os.path.exists(f'{val}/YGO_2020.dat') and os.path.exists(
@@ -88,24 +90,28 @@ class Randomizer:
             raise "Invalid game_path"
 
     def run(self):
+        self.logger.info('start running...')
         step = 0
         max_step = 3
         try:
             yield step, "setting up randomizer...", max_step
+            self.logger.info("setting up randomizer...")
             step += 1
             self.card_helper = CardHelper(self.settings)
             self.setup_seed()
-            print(self.seed, self.settings)
+            self.logger.debug(f'{self.seed}, {self.settings}')
             self.setup_game_files()
             self.get_custom_decks()
             # ToDo: self.write_default_placement_files()
             if self.placement_folder:
                 yield step, "applying placement file(s)...", max_step
+                self.logger.info("applying placement file(s)...")
                 step += 1
                 # ToDo
                 self.apply_placement()
             else:
                 yield step, "randomizing...", 3
+                self.logger.info("randomizing...")
                 step += 1
                 gen = self.randomize()
                 for i in gen:
@@ -114,12 +120,15 @@ class Randomizer:
                     else:
                         yield 1, "randomizing...", max_step, *i
             yield step, "writing output...", max_step
+            self.logger.info("writing output...")
             step += 1
             self.output_result()
             # ToDo? self.copy_to_game_path()
             self.cleanup()
-            yield step, "done...", max_step
+            yield step, "done", max_step
+            self.logger.info('done')
         except Exception as e:
+            self.logger.exception('An error occurred')
             yield -1, e, traceback.format_exc()
 
     def setup_seed(self):
@@ -161,6 +170,7 @@ class Randomizer:
         max_step = 7
         try:
             yield step, "randomizing decks...", max_step
+            self.logger.info("randomizing decks...")
             step += 1
             if self.settings.random_decks == RandomDeckSettings.Off:
                 pass
@@ -173,10 +183,12 @@ class Randomizer:
                 # ToDo
                 pass
             yield step, "randomizing arenas...", max_step
+            self.logger.info("randomizing arenas...")
             step += 1
             if self.settings.shuffle_arenas:
                 self.shuffle_arenas()
             yield step, "randomizing shop packs...", max_step
+            self.logger.info("randomizing shop packs...")
             step += 1
             if self.settings.random_shop_packs == RandomShopPackSettings.Off and self.settings.random_battle_packs != RandomBattlePacksSettings.Off:
                 # we need to make sure shop packs are also in the compress folder, if they are not random,
@@ -187,22 +199,27 @@ class Randomizer:
             elif self.settings.random_shop_packs == RandomShopPackSettings.Randomized:
                 self.randomize_shop_packs()
             yield step, "randomizing shop portraits...", max_step
+            self.logger.info("randomizing shop portraits...")
             step += 1
             if self.settings.shuffle_shop_portraits:
                 self.shuffle_shop_portraits()
             yield step, "randomizing shop prices...", max_step
+            self.logger.info("randomizing shop prices...")
             step += 1
             if self.settings.random_shop_prices:
                 self.randomize_shop_prices()
             yield step, "randomizing signature cards...", max_step
+            self.logger.info("randomizing signature cards...")
             step += 1
             if self.settings.random_sig_cards:
                 self.randomize_sig_cards()
             yield step, "randomizing portraits...", max_step
+            self.logger.info("randomizing portraits...")
             step += 1
             if self.settings.random_duelist_portraits != RandomDuelistPortraitSettings.Off:
                 self.shuffle_duelists_portraits()
             yield step, "randomizing battle packs...", max_step
+            self.logger.info("randomizing battle packs...")
             step += 1
             if self.settings.random_battle_packs == RandomBattlePacksSettings.Off and self.settings.random_shop_packs != RandomShopPackSettings.Off:
                 # we need to make sure battle packs are also in the compress folder, if they are not random,
@@ -213,6 +230,7 @@ class Randomizer:
             elif self.settings.random_battle_packs == RandomBattlePacksSettings.Randomized:
                 self.randomize_battle_packs()
         except Exception as e:
+            self.logger.exception('An error occurred')
             yield -1, e, traceback.format_exc()
 
     def shuffle_decks(self):
@@ -259,11 +277,11 @@ class Randomizer:
             dst = f'{dst_folder}/{k}'
             if v not in self.decks:
                 src = f'{src_folder}/{v}'
-                print(f'{src} -> {dst}')
+                self.logger.debug(f'{src} -> {dst}')
                 shutil.copyfile(src, dst)
             else:
                 deck = self.decks[v]
-                print(f'writing {dst}')
+                self.logger.debug(f'writing {dst}')
                 deck.write(dst)
 
     def apply_shuffled_files(self, subdir, shuffled_files: dict[str, str]):
@@ -274,7 +292,7 @@ class Randomizer:
         for k, v in shuffled_files.items():
             dst = f'{dst_folder}/{k}'
             src = f'{src_folder}/{v}'
-            print(f'{src} -> {dst}')
+            self.logger.debug(f'{src} -> {dst}')
             shutil.copyfile(src, dst)
 
     def get_out_path(self):
@@ -612,7 +630,7 @@ class Randomizer:
         for k, v in files.items():
             dst = f'{dst_folder}/{k}'
             deck = self.random_shop_packs[v]
-            print(f'writing {dst}')
+            self.logger.debug(f'writing {dst}')
             deck.write(dst)
 
     def apply_random_battle_pack_files(self, files):
@@ -622,7 +640,7 @@ class Randomizer:
         for k, v in files.items():
             dst = f'{dst_folder}/{k}'
             deck = self.random_battle_packs[v]
-            print(f'writing {dst}')
+            self.logger.debug(f'writing {dst}')
             deck.write(dst)
 
     def get_char_name_for_bust_file(self, bust_file):

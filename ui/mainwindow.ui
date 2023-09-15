@@ -658,12 +658,30 @@
     </property>
     <addaction name="action_copy_game_files"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="action_validate_custom"/>
+    <addaction name="action_converter"/>
+   </widget>
    <addaction name="menuSetup"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_copy_game_files">
    <property name="text">
     <string>Copy game files</string>
+   </property>
+  </action>
+  <action name="action_validate_custom">
+   <property name="text">
+    <string>Edit custom deck</string>
+   </property>
+  </action>
+  <action name="action_converter">
+   <property name="text">
+    <string>Card ID Converter</string>
    </property>
   </action>
  </widget>

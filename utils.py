@@ -1,6 +1,6 @@
 import os
 
-prog_name = 'Yo-Gi-Oh Legacy of the Duelist: Link Evolution Randomizer'
+prog_name = 'CyberEmpire - Yo-Gi-Oh LotD:LE Randomizer'
 
 
 def delete_folder(dir, delete_this=True):

@@ -43,16 +43,18 @@ class Deck:
             for i in range(0, self.side_count):
                 write_int16(f, self.side_ids[i])
 
-    def print(self):
-        print(f"Main Deck ({self.main_count} cards):")
+    def __str__(self) -> str:
+        result = ''
+        result += f"Main Deck ({self.main_count} cards):\n"
         for i in range(0, self.main_count):
-            print(i + 1, self.main_ids[i], card_name_mapper.get_name(self.main_ids[i]))
-        print(f"Extra Deck ({self.extra_count} cards):")
+            result += f'{i + 1}\t{self.main_ids[i]}\t{card_name_mapper.get_name(self.main_ids[i])}\n'
+        result += f"Extra Deck ({self.extra_count} cards):\n"
         for i in range(0, self.extra_count):
-            print(i + 1, self.extra_ids[i], card_name_mapper.get_name(self.extra_ids[i]))
-        print(f"Side Deck ({self.side_count} cards):")
+            result += f'{i + 1}\t{self.extra_ids[i]}\t{card_name_mapper.get_name(self.extra_ids[i])}\n'
+        result += f"Side Deck ({self.side_count} cards):\n"
         for i in range(0, self.side_count):
-            print(i + 1, self.side_ids[i], card_name_mapper.get_name(self.side_ids[i]))
+            result += f'{i + 1}\t{self.side_ids[i]}\t{card_name_mapper.get_name(self.side_ids[i])}\n'
+        return result
 
 
 class DeckInfo:

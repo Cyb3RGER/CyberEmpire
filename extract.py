@@ -3,6 +3,8 @@
 # used with permission
 # edited for the rando by Cyb3R
 ##############################################################
+import logging
+logger = logging.getLogger('cyber_empire.extract')
 
 
 # add files you want in here, doesn't have to be an exact name
@@ -60,14 +62,14 @@ def extract(src, dest, verbose=False):
                     root += f"{folder}\\"
 
             if verbose:
-                print(f"{root + path[-1]:<60s} -> {hex(sz)}")
+                logger.debug(f"{root + path[-1]:<60s} -> {hex(sz)}")
 
             f.seek(pos, 0)
             base_pos = pos
 
             if ".zib" in path[-1]:
                 if verbose:
-                    print(f"\tExtracting sub-archive...")
+                    logger.debug(f"\tExtracting sub-archive...")
                 # root += path[-1].replace(".zib", "_zib") + "\\"
                 root += path[-1] + "\\"
                 if not os.path.exists(root):
@@ -84,7 +86,7 @@ def extract(src, dest, verbose=False):
                         file_size += 1
                     fname = str(f.read(0x38), "utf8").replace("\x00", "")
                     if verbose:
-                        print(f"\t{root + fname:<40s} -> {hex(file_size)}")
+                        logger.debug(f"\t{root + fname:<40s} -> {hex(file_size)}")
 
                     toc_pos = f.tell()
                     f.seek(base_pos + file_pos, 0)
