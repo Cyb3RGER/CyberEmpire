@@ -14,5 +14,5 @@ settings.json
 !/custom_decks/*.md
 /build/
 /dist/
-
+/logs/
 
