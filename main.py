@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import logger
 import ui
@@ -26,7 +27,8 @@ if __name__ == '__main__':
         rando = Randomizer()
         rando.setup_from_args(args, True)
         rando_gen = rando.run()
+        logger = logging.getLogger('cyber_empire')
         for i in rando_gen:
-            print(i)
+            logger.debug(i)
     else:
         ui.run_ui(args)

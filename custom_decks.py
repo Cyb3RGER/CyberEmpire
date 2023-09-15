@@ -40,6 +40,8 @@ class CustomDeck:
         self.filler_ids: list[int] = []
 
     def validate(self, parser):
+        if self.main_count == 0:
+            raise ParseException(parser, f'Main Deck is empty')
         # make sure groups fit in deck
         main_group_count = sum([i.count * i.factor for i in self.main_ids if type(i) == CustomDeckCardGroup])
         if self.main_count < main_group_count:
@@ -87,10 +89,12 @@ class CustomDeckParser:
         self.line_num: int = 0
         self.mode: ParsingMode = ParsingMode.Init
         self.logger = logging.getLogger('cyber_empire.custom_deck_parser')
+        self.logger.setLevel(logging.DEBUG)
 
     def parse(self, data: str, file_name: Optional[str] = None) -> CustomDeck:
         if file_name:
             self.file_name = file_name
+        self.logger.info(f'parsing {self.file_name}...')
         self.mode = ParsingMode.Init
         main_found = False
         extra_found = False
@@ -175,6 +179,7 @@ class CustomDeckParser:
             raise
         finally:
             self.mode = ParsingMode.EOF
+        self.logger.info('done!')
         return deck
 
     def load(self, path: str) -> CustomDeck:
@@ -209,7 +214,11 @@ class CustomDeckParser:
 
     def get_count(self, line) -> int:
         try:
-            return int(line.split('=')[-1].strip())
+            cnt = int(line.split('=')[-1].strip())
+            if cnt < 0:
+                raise ParseException(self, 'invalid count.')
+            return cnt
+
         except:
             raise ParseException(self, 'invalid count.')
 

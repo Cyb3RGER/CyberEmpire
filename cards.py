@@ -1,4 +1,5 @@
 import csv
+import logging
 import random
 from collections import Counter
 from typing import Optional
@@ -86,6 +87,7 @@ class CardHelper:
         self.exclude_tuner_cards: bool = settings.exclude_tuner_cards
         self.exclude_spirit_cards: bool = settings.exclude_spirit_cards
         self.respect_card_limits: bool = settings.respect_card_limits
+        self.logger = logging.getLogger('cyber_empire.card_helper')
         self.load_card_props()
         self.load_card_limits()
         self.load_extra_excluded_cards()
@@ -216,8 +218,8 @@ class CardHelper:
             reroll_count = 0
             for key, v in counter.items():
                 limit_actual = (limit if key.id_ not in self.card_limits else min(limit, self.card_limits[key.id_]))
-                print(f'rerolling {key.id_} with limit {limit_actual} (limit param: {limit}, '
-                      f'card limit: {self.card_limits[key.id_] if key.id_ in self.card_limits else None})')
+                self.logger.debug(f'rerolling {key.id_} with limit {limit_actual} (limit param: {limit}, '
+                       f'card limit: {self.card_limits[key.id_] if key.id_ in self.card_limits else None})')
                 if v <= limit_actual:
                     continue
                 # remove card that is over limit from population

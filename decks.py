@@ -124,11 +124,11 @@ class DeckInfo:
     def load_cards(self, game_path: str):
         self.cards = Deck(f"{game_path}/decks.zib/{self.deck_id_name}.ydc")
 
-    def print(self):
-        print("deck", f"{self.deck_id}", f"{self.deck_id_name}", f"{self.deck_name}",
-              f"{card_name_mapper.get_name(self.sig_card_id)}", f"{char_name_mapper.get_char_name(self.char_id)}")
-        if self.cards:
-            self.cards.print()
+    # def print(self):
+    #     print("deck", f"{self.deck_id}", f"{self.deck_id_name}", f"{self.deck_name}",
+    #           f"{card_name_mapper.get_name(self.sig_card_id)}", f"{char_name_mapper.get_char_name(self.char_id)}")
+    #     if self.cards:
+    #         self.cards.print()
 
 
 class DeckData:
@@ -155,10 +155,10 @@ class DeckData:
             for i in range(0, self.deck_count):
                 self.decks[i].write_strings(f)
 
-    def print(self):
-        print(f"deck data: {self.deck_count} decks\n")
-        for i in range(0, self.deck_count):
-            self.decks[i].print()
+    # def print(self):
+    #     print(f"deck data: {self.deck_count} decks\n")
+    #     for i in range(0, self.deck_count):
+    #         self.decks[i].print()
 
     def get_deck_by_sig_card_id(self, card) -> DeckInfo:
         return [deck for deck in self.decks if deck.sig_card_id == card][0]

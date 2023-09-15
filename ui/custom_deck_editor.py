@@ -26,11 +26,12 @@ class CustomDeckEditor(QDialog):
         self.card_helper = CardHelper(mock_settings)
         self.setWindowTitle(f'{prog_name} - Custom Deck Editor')
         self.logger = logging.getLogger('custom_deck_validator')
+        self.logger.setLevel(logging.DEBUG)
         self.parser = custom_decks.CustomDeckParser()
         self.handler = TextEditLogHandler(self.ui.txt_result)
         formatter = logging.Formatter('%(levelname)s - %(message)s')
         self.handler.setFormatter(formatter)
-        self.handler.setLevel(logging.WARN)
+        self.handler.setLevel(logging.INFO)
         # replace parser log handlers
         self.parser.logger = self.logger
         self.parser.logger.addHandler(self.handler)
@@ -39,7 +40,6 @@ class CustomDeckEditor(QDialog):
         self.ui.txt_source.setObjectName(u"txt_source")
         self.ui.txt_source.setStyleSheet(u"")
         self.ui.txt_source.setBackgroundVisible(False)
-        self.ui
         self.ui.gridLayout.addWidget(self.ui.txt_source, 1, 0, 1, 1)
 
         self.ui.btn_file.clicked.connect(self.select_file)
@@ -80,6 +80,7 @@ class CustomDeckEditor(QDialog):
 
     def reset_file(self):
         self.current_file = None
+        self.setWindowTitle(f'{prog_name} - Custom Deck Editor')
         self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Save).setEnabled(False)
         self.ui.txt_source.clear()
         self.reset_log()
@@ -99,6 +100,8 @@ class CustomDeckEditor(QDialog):
                     data = f.read()
                     self.ui.txt_source.setPlainText(data)
                 self.current_file = file_path
+                _,file_name = os.path.split(self.current_file)
+                self.setWindowTitle(f'{prog_name} - Custom Deck Editor - {file_name}')
                 self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Save).setEnabled(True)
                 try:
                     self.deck = self.parser.load(file_path)

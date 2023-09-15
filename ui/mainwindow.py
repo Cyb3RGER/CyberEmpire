@@ -177,7 +177,7 @@ class MainWindow(QMainWindow):
             if len(name_split) >= 1 and name_split[0] in type_mapping:
                 attr_value = type_mapping[name_split[0]](value)
                 self.rando.settings.__setattr__(attr_name, attr_value)
-                self.logger.debug(attr_name, value, attr_value)
+                self.logger.debug(f'{attr_name} {value} {attr_value}')
 
     def open_validator(self):
         self.editor = CustomDeckEditor()

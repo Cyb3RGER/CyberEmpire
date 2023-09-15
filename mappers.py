@@ -21,10 +21,10 @@ class NameMapper:
                     self.name_to_id[row[0]] = int(row[1], id_base)
                     self.id_to_name[int(row[1], id_base)] = row[0]
 
-    # ToDo: to __str__
-    def print(self):
+    def __str__(self):
+        result = ''
         for k, v in self.id_to_name.items():
-            print(f'{k}: {v}')
+            result += f'{k}: {v}\n'
 
 
 class CardNameMapper(NameMapper):

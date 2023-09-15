@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QTextEdit
 class TextEditLogHandler(Handler):
     ErrTextColor = QColor(207, 91, 92)
     WarnTextColor = QColor(207, 207, 89)
-    DefaultTextColor = QColor(0, 0, 0)
+    DefaultTextColor = QColor(160, 160, 160)
 
     def __init__(self, text_edit: QTextEdit):
         super().__init__()
