@@ -676,7 +676,7 @@
   </action>
   <action name="action_validate_custom">
    <property name="text">
-    <string>Edit custom deck</string>
+    <string>Custom Deck Editor</string>
    </property>
   </action>
   <action name="action_converter">
