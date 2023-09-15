@@ -532,7 +532,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.action_copy_game_files.setText(QCoreApplication.translate("MainWindow", u"Copy game files", None))
-        self.action_validate_custom.setText(QCoreApplication.translate("MainWindow", u"Edit custom deck", None))
+        self.action_validate_custom.setText(QCoreApplication.translate("MainWindow", u"Custom Deck Editor", None))
         self.action_converter.setText(QCoreApplication.translate("MainWindow", u"Card ID Converter", None))
         self.grp_opt_duelists.setTitle(QCoreApplication.translate("MainWindow", u"Duelists", None))
         self.lbl_random_duelist_portraits.setText(QCoreApplication.translate("MainWindow", u"Randomize Duelist Portraits", None))
