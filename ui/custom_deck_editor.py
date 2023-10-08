@@ -46,6 +46,7 @@ class CustomDeckEditor(QDialog):
         self.ui.txt_source.textChanged.connect(self.update_log)
         self.ui.btn_generate.clicked.connect(self.generate_deck)
         self.ui.btn_generate.setEnabled(False)
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Save).setEnabled(False)
         self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Save).clicked.connect(self.save_file)
 
     def __del__(self):

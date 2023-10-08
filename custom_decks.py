@@ -158,7 +158,7 @@ class CustomDeckParser:
                     if id_ is not None:
                         if current_group is not None:
                             current_group.ids.append(id_)
-                        if self.mode == ParsingMode.MainDeck:
+                        elif self.mode == ParsingMode.MainDeck:
                             deck.main_ids.append(id_)
                         elif self.mode == ParsingMode.ExtraDeck:
                             deck.extra_ids.append(id_)

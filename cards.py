@@ -262,14 +262,19 @@ class CardHelper:
             # this should be caught by parser
             raise 'too many cards from groups in deck'
         elif len(result) < count:
-            result += self._get_id_list(random, ids, count-len(result), filler)
+            if len(ids) > 0 or len(filler) > 0:
+                result += self._get_id_list(random, ids, count-len(result), filler)
+            else:
+                all_ids = []
+                list(map(all_ids.extend, [g.ids for g in groups]))
+                result += self._get_id_list(random, all_ids, count-len(result), filler)
         assert len(result) == count, 'count doesnt match result length'
         return result
 
     def _get_id_list(self, random: random.Random, id_list: list[int], count: int, filler: list[int]) -> list[int]:
         result: list[int]
         if len(id_list) > count:
-            result = random.choices(id_list, k=count)
+            result = random.sample(id_list, k=count)
         else:
             result = id_list.copy()
         if len(result) < count:
