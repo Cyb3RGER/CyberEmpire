@@ -20,12 +20,12 @@ def main():
         for k, v in linked_cards.items():
             if len(v) == 0:
                 continue
-            f.write(f'{card_name_mapper.get_name(k)} ->\n')
+            f.write(f'{card_name_mapper.get_name(k)} (ID: {k}) ->\n')
             for v2 in v:
                 name = card_name_mapper.get_name(v2)
                 if name.startswith("!"):
                     name = f'! unknown link value {v2} (0x{v2:x}) !'
-                f.write(f'\t{name}\n')
+                f.write(f'\t{name} (ID: {v2})\n')
             f.write('\n')
 
 
